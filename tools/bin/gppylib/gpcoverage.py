@@ -39,10 +39,10 @@ class GpWriteFigleafCoverageHtml(Command):
     coverage information that has been collected."""
     
     def __init__(self,name,filename, directory,ctxt=LOCAL,remoteHost=None):
-        gphome = os.getenv("GPHOME", None)
-        if not gphome:
-            raise Exception('GPHOME environment variable not set.')
-        cmdStr = "%s -d %s %s" % (os.path.normpath(gphome + '/lib/python/figleaf/figleaf2html'), directory, filename)        
+        hawq_home = os.getenv("HAWQ_HOME", None)
+        if not hawq_home:
+            raise Exception('HAWQ_HOME environment variable not set.')
+        cmdStr = "%s -d %s %s" % (os.path.normpath(hawq_home + '/lib/python/figleaf/figleaf2html'), directory, filename)        
         Command.__init__(self,name,cmdStr,ctxt,remoteHost)
 
     @staticmethod

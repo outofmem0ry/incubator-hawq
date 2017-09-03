@@ -36,7 +36,7 @@ from hawqpylib.hawqlib import HawqXMLParser
 logger = get_default_logger()
 
 #TODO:  need a better way of managing environment variables.
-GPHOME=os.environ.get('GPHOME')
+HAWQ_HOME=os.environ.get('HAWQ_HOME')
 
 #Default timeout for segment start
 SEGMENT_TIMEOUT_DEFAULT=600
@@ -64,7 +64,7 @@ def getSyncmasterPID(hostname, datadir):
 #-----------------------------------------------
 class PySync(Command):
     def __init__(self,name,srcDir,dstHost,dstDir,ctxt=LOCAL,remoteHost=None, options=None):
-        psync_executable=GPHOME + "/bin/lib/pysync.py"
+        psync_executable=HAWQ_HOME + "/bin/lib/pysync.py"
 
         # MPP-13617
         if ':' in dstHost and not ']' in dstHost:
@@ -158,7 +158,7 @@ class PgCtlStartArgs(CmdArgs):
 
     >>> a = PgCtlStartArgs("/data1/master/gpseg-1", str(PgCtlBackendOptions(5432, 1, 2)), 123, None, None, True, 600)
     >>> str(a).split(' ') #doctest: +NORMALIZE_WHITESPACE
-    ['env', GPERA=123', '$GPHOME/bin/pg_ctl', '-D', '/data1/master/gpseg-1', '-l',
+    ['env', GPERA=123', '$HAWQ_HOME/bin/pg_ctl', '-D', '/data1/master/gpseg-1', '-l',
      '/data1/master/gpseg-1/pg_log/startup.log', '-w', '-t', '600',
      '-o', '"', '-p', '5432', '-b', '1', '-z', '2', '--silent-mode=true', '"', 'start']
     """
@@ -178,7 +178,7 @@ class PgCtlStartArgs(CmdArgs):
             "env",			# variables examined by gpkill/gpdebug/etc
             "GPSESSID=0000000000", 	# <- overwritten with gp_session_id to help identify orphans
             "GPERA=%s" % str(era),	# <- master era used to help identify orphans
-            "$GPHOME/bin/pg_ctl",
+            "$HAWQ_HOME/bin/pg_ctl",
             "-D", str(datadir),
             "-l", "%s/pg_log/startup.log" % datadir,
         ])
@@ -196,7 +196,7 @@ class PgCtlStopArgs(CmdArgs):
     to stop a backend postmaster
 
     >>> str(PgCtlStopArgs("/data1/master/gpseg-1", "smart", True, 600))
-    '$GPHOME/bin/pg_ctl -D /data1/master/gpseg-1 -m smart -w -t 600 stop'
+    '$HAWQ_HOME/bin/pg_ctl -D /data1/master/gpseg-1 -m smart -w -t 600 stop'
 
     """
 
@@ -208,7 +208,7 @@ class PgCtlStopArgs(CmdArgs):
         @param timeout: number of seconds to wait before giving up
         """
         CmdArgs.__init__(self, [
-            "$GPHOME/bin/pg_ctl",
+            "$HAWQ_HOME/bin/pg_ctl",
             "-D", str(datadir),
             "-m", str(mode),
         ])
@@ -249,7 +249,7 @@ class SendFilerepTransitionMessage(Command):
     def __init__(self, name, inputFile, port=None,ctxt=LOCAL, remoteHost=None, dataDir=None):
         if not remoteHost:
             remoteHost = "localhost"
-        self.cmdStr='$GPHOME/bin/gp_primarymirror -h %s -p %s -i %s' % (remoteHost,port,inputFile)
+        self.cmdStr='$HAWQ_HOME/bin/gp_primarymirror -h %s -p %s -i %s' % (remoteHost,port,inputFile)
         self.dataDir = dataDir
         Command.__init__(self,name,self.cmdStr,ctxt,remoteHost)
 
@@ -292,7 +292,7 @@ class SendFilerepTransitionStatusMessage(Command):
     def __init__(self, name, msg, dataDir=None, port=None,ctxt=LOCAL, remoteHost=None):
         if not remoteHost:
             remoteHost = "localhost"
-        self.cmdStr='$GPHOME/bin/gp_primarymirror -h %s -p %s' % (remoteHost,port)
+        self.cmdStr='$HAWQ_HOME/bin/gp_primarymirror -h %s -p %s' % (remoteHost,port)
         self.dataDir = dataDir
 
         logger.debug("Sending msg %s and cmdStr %s" % (msg, self.cmdStr))
@@ -374,7 +374,7 @@ class SendFilerepVerifyMessage(Command):
 
         logger.debug("gp_verify message sent to %s:%s:\n%s" % (host, port, "\n".join(msg_contents)))
 
-        self.cmdStr='$GPHOME/bin/gp_primarymirror -h %s -p %s' % (host, port)
+        self.cmdStr='$HAWQ_HOME/bin/gp_primarymirror -h %s -p %s' % (host, port)
         Command.__init__(self, name, self.cmdStr, ctxt, remoteHost, stdin="\n".join(msg_contents))
 
 
@@ -404,7 +404,7 @@ class SegmentIsShutDown(Command):
     Get the pg_controldata status, and check that it says 'shut down'
     """
     def __init__(self,name,directory,ctxt=LOCAL,remoteHost=None):
-        cmdStr = "$GPHOME/bin/pg_controldata %s" % directory
+        cmdStr = "$HAWQ_HOME/bin/pg_controldata %s" % directory
         Command.__init__(self,name,cmdStr,ctxt,remoteHost)
 
     def is_shutdown(self):
@@ -466,7 +466,7 @@ class GpGetStatusUsingTransitionArgs(CmdArgs):
     --------
 
     >>> str(GpGetStatusUsingTransitionArgs([],'request'))
-    '$GPHOME/sbin/gpgetstatususingtransition.py -s request'
+    '$HAWQ_HOME/sbin/gpgetstatususingtransition.py -s request'
     """
 
     def __init__(self, segments, status_request):
@@ -474,7 +474,7 @@ class GpGetStatusUsingTransitionArgs(CmdArgs):
         @param status_request
         """
         CmdArgs.__init__(self, [
-            "$GPHOME/sbin/gpgetstatususingtransition.py",
+            "$HAWQ_HOME/sbin/gpgetstatususingtransition.py",
             "-s", str(status_request)
         ])
         self.set_segments(segments)
@@ -501,7 +501,7 @@ class GpSegStartArgs(CmdArgs):
     --------
 
     >>> str(GpSegStartArgs('en_US.utf-8:en_US.utf-8:en_US.utf-8', 'mirrorless', 'gpversion', 1, 123, 600))
-    "$GPHOME/sbin/gpsegstart.py -C en_US.utf-8:en_US.utf-8:en_US.utf-8 -M mirrorless -V 'gpversion' -n 1 --era 123 -t 600"
+    "$HAWQ_HOME/sbin/gpsegstart.py -C en_US.utf-8:en_US.utf-8:en_US.utf-8 -M mirrorless -V 'gpversion' -n 1 --era 123 -t 600"
     """
 
     def __init__(self, localeData, mirrormode, gpversion, num_cids, era, timeout):
@@ -514,7 +514,7 @@ class GpSegStartArgs(CmdArgs):
         @param timeout - seconds to wait before giving up
         """
         CmdArgs.__init__(self, [
-            "$GPHOME/sbin/gpsegstart.py",
+            "$HAWQ_HOME/sbin/gpsegstart.py",
             "-C", str(localeData),
             "-M", str(mirrormode),
             "-V '%s'" % gpversion,
@@ -545,7 +545,7 @@ class GpSegStartArgs(CmdArgs):
 
 
 class GpSegStartCmd(Command):
-    def __init__(self, name, gphome, segments, localeData, gpversion,
+    def __init__(self, name, hawq_home, segments, localeData, gpversion,
                  mirrormode, numContentsInCluster, era,
                  timeout=SEGMENT_TIMEOUT_DEFAULT, verbose=False,
                  ctxt=LOCAL, remoteHost=None, pickledTransitionData=None,
@@ -569,9 +569,9 @@ class GpSegStartCmd(Command):
 
 
 class GpSegChangeMirrorModeCmd(Command):
-    def __init__(self, name, gphome, localeData, gpversion, dbs, targetMode,
+    def __init__(self, name, hawq_home, localeData, gpversion, dbs, targetMode,
                  pickledParams, verbose=False, ctxt=LOCAL, remoteHost=None):
-        self.gphome=gphome
+        self.hawq_home=hawq_home
         self.dblist=dbs
         self.dirlist=[]
         for db in dbs:
@@ -585,16 +585,16 @@ class GpSegChangeMirrorModeCmd(Command):
         else:
             setverbose=""
 
-        cmdStr="$GPHOME/sbin/gpsegtoprimaryormirror.py %s -D %s -C %s -M %s -p %s -V '%s'" % \
+        cmdStr="$HAWQ_HOME/sbin/gpsegtoprimaryormirror.py %s -D %s -C %s -M %s -p %s -V '%s'" % \
                 (setverbose,dirstr,localeData,targetMode,pickledParams,gpversion)
 
         Command.__init__(self,name,cmdStr,ctxt,remoteHost)
 
 #-----------------------------------------------
 class GpSegStopCmd(Command):
-    def __init__(self, name, gphome, version,mode,dbs,timeout=SEGMENT_TIMEOUT_DEFAULT,
+    def __init__(self, name, hawq_home, version,mode,dbs,timeout=SEGMENT_TIMEOUT_DEFAULT,
                  verbose=False, ctxt=LOCAL, remoteHost=None):
-        self.gphome=gphome
+        self.hawq_home=hawq_home
         self.dblist=dbs
         self.dirportlist=[]
         self.mode=mode
@@ -610,7 +610,7 @@ class GpSegStopCmd(Command):
         else:
             setverbose=""
 
-        self.cmdStr="$GPHOME/sbin/gpsegstop.py %s -D %s -m %s -t %s -V '%s'"  %\
+        self.cmdStr="$HAWQ_HOME/sbin/gpsegstop.py %s -D %s -m %s -t %s -V '%s'"  %\
                         (setverbose,dirstr,mode,timeout,version)
 
         Command.__init__(self,name,self.cmdStr,ctxt,remoteHost)
@@ -620,7 +620,7 @@ class GpInitSystem(Command):
     def __init__(self,name,configFile,hostsFile, ctxt=LOCAL, remoteHost=None):
         self.configFile=configFile
         self.hostsFile=hostsFile
-        self.cmdStr="$GPHOME/bin/gpinitsystem -a -c %s -h %s" % (configFile,hostsFile)
+        self.cmdStr="$HAWQ_HOME/bin/gpinitsystem -a -c %s -h %s" % (configFile,hostsFile)
         Command.__init__(self, name, self.cmdStr, ctxt, remoteHost)
 
 #-----------------------------------------------
@@ -628,13 +628,13 @@ class GpDeleteSystem(Command):
     def __init__(self,name,datadir, ctxt=LOCAL, remoteHost=None):
         self.datadir=datadir
         self.input="y\ny\n"
-        self.cmdStr="$GPHOME/bin/gpdeletesystem -d %s -f " % (datadir)
+        self.cmdStr="$HAWQ_HOME/bin/gpdeletesystem -d %s -f " % (datadir)
         Command.__init__(self, name, self.cmdStr, ctxt, remoteHost,stdin=self.input)
 
 #-----------------------------------------------
 class GpStart(Command):
     def __init__(self, name, masterOnly=False, restricted=False, verbose=False,ctxt=LOCAL, remoteHost=None, upgrade=False):
-        self.cmdStr="$GPHOME/bin/gpstart -a"
+        self.cmdStr="$HAWQ_HOME/bin/gpstart -a"
         if masterOnly:
             self.cmdStr += " -m"
             self.propagate_env_map['GPSTART_INTERNAL_MASTER_ONLY'] = 1
@@ -654,7 +654,7 @@ class GpStart(Command):
 #-----------------------------------------------
 class NewGpStart(Command):
     def __init__(self, name, masterOnly=False, restricted=False, verbose=False,nostandby=False,ctxt=LOCAL, remoteHost=None, masterDirectory=None):
-        self.cmdStr="$GPHOME/bin/gpstart -a"
+        self.cmdStr="$HAWQ_HOME/bin/gpstart -a"
         if masterOnly:
             self.cmdStr += " -m"
             self.propagate_env_map['GPSTART_INTERNAL_MASTER_ONLY'] = 1
@@ -679,7 +679,7 @@ class NewGpStart(Command):
 #-----------------------------------------------
 class NewGpStop(Command):
     def __init__(self, name, masterOnly=False, restart=False, fast=False, force=False, verbose=False, ctxt=LOCAL, remoteHost=None):
-        self.cmdStr="$GPHOME/bin/gpstop -a"
+        self.cmdStr="$HAWQ_HOME/bin/gpstop -a"
         if masterOnly:
             self.cmdStr += " -m"
         if verbose or logging_is_verbose():
@@ -700,7 +700,7 @@ class NewGpStop(Command):
 #-----------------------------------------------
 class GpStop(Command):
     def __init__(self, name, masterOnly=False, verbose=False, quiet=False, restart=False, fast=False, force=False, datadir=None,ctxt=LOCAL, remoteHost=None):
-        self.cmdStr="$GPHOME/bin/gpstop -a"
+        self.cmdStr="$HAWQ_HOME/bin/gpstop -a"
         if masterOnly:
             self.cmdStr += " -m"
         if restart:
@@ -726,7 +726,7 @@ class GpStop(Command):
 #-----------------------------------------------
 class GpRecoverseg(Command):
     def __init__(self, name, ctxt=LOCAL, remoteHost=None):
-        self.cmdStr = "$GPHOME/bin/gprecoverseg -a"
+        self.cmdStr = "$HAWQ_HOME/bin/gprecoverseg -a"
         Command.__init__(self, name, self.cmdStr, ctxt, remoteHost)
 
 #-----------------------------------------------
@@ -735,7 +735,7 @@ class Psql(Command):
         env = ''
         if utilityMode:
             env = 'PGOPTIONS="-c gp_session_role=utility"'
-        cmdStr = '%s $GPHOME/bin/psql ' % env
+        cmdStr = '%s $HAWQ_HOME/bin/psql ' % env
         if port is not None:
             cmdStr += '-p %d ' % port
         if query is not None and filename is not None:
@@ -776,7 +776,7 @@ class GpCleanSegmentDirectories(Command):
     """
     def __init__(self, name, segmentsToClean, ctxt, remoteHost):
         pickledSegmentsStr = base64.urlsafe_b64encode(pickle.dumps(segmentsToClean))
-        cmdStr = "$GPHOME/sbin/gpcleansegmentdir.py -p %s" % pickledSegmentsStr
+        cmdStr = "$HAWQ_HOME/sbin/gpcleansegmentdir.py -p %s" % pickledSegmentsStr
         Command.__init__(self, name, cmdStr, ctxt, remoteHost)
 
 #-----------------------------------------------
@@ -798,37 +798,37 @@ class GpDumpDirsExist(Command):
 
 #-----------------------------------------------
 class GpVersion(Command):
-    def __init__(self,name,gphome,ctxt=LOCAL,remoteHost=None):
-        # XXX this should make use of the gphome that was passed
+    def __init__(self,name,hawq_home,ctxt=LOCAL,remoteHost=None):
+        # XXX this should make use of the hawq_home that was passed
         # in, but this causes problems in some environments and
         # requires further investigation.
 
-        self.gphome=gphome
-        #self.cmdStr="%s/bin/postgres --gp-version" % gphome
-        self.cmdStr="$GPHOME/bin/postgres --gp-version"
+        self.hawq_home=hawq_home
+        #self.cmdStr="%s/bin/postgres --gp-version" % hawq_home
+        self.cmdStr="$HAWQ_HOME/bin/postgres --gp-version"
         Command.__init__(self,name,self.cmdStr,ctxt,remoteHost)
 
     def get_version(self):
         return self.results.stdout.strip()
 
     @staticmethod
-    def local(name,gphome):
-        cmd=GpVersion(name,gphome)
+    def local(name,hawq_home):
+        cmd=GpVersion(name,hawq_home)
         cmd.run(validateAfter=True)
         return cmd.get_version()
 
 #-----------------------------------------------
 class GpCatVersion(Command):
     """
-    Get the catalog version of the binaries in a given GPHOME
+    Get the catalog version of the binaries in a given HAWQ_HOME
     """
-    def __init__(self,name,gphome,ctxt=LOCAL,remoteHost=None):
-        # XXX this should make use of the gphome that was passed
+    def __init__(self,name,hawq_home,ctxt=LOCAL,remoteHost=None):
+        # XXX this should make use of the hawq_home that was passed
         # in, but this causes problems in some environments and
         # requires further investigation.
-        self.gphome=gphome
-        #cmdStr="%s/bin/postgres --catalog-version" % gphome
-        cmdStr="$GPHOME/bin/postgres --catalog-version"
+        self.hawq_home=hawq_home
+        #cmdStr="%s/bin/postgres --catalog-version" % hawq_home
+        cmdStr="$HAWQ_HOME/bin/postgres --catalog-version"
         Command.__init__(self,name,cmdStr,ctxt,remoteHost)
 
     def get_version(self):
@@ -838,8 +838,8 @@ class GpCatVersion(Command):
         return self.results.stdout.split(':')[1].strip()
 
     @staticmethod
-    def local(name,gphome):
-        cmd=GpCatVersion(name,gphome)
+    def local(name,hawq_home):
+        cmd=GpCatVersion(name,hawq_home)
         cmd.run(validateAfter=True)
         return cmd.get_version()
 
@@ -849,7 +849,7 @@ class GpCatVersionDirectory(Command):
     Get the catalog version of a given database directory
     """
     def __init__(self,name,directory,ctxt=LOCAL,remoteHost=None):
-        cmdStr = "$GPHOME/bin/pg_controldata %s" % directory
+        cmdStr = "$HAWQ_HOME/bin/pg_controldata %s" % directory
         Command.__init__(self,name,cmdStr,ctxt,remoteHost)
 
     def get_version(self):
@@ -872,13 +872,13 @@ class GpSuspendSegmentsOnHost(Command):
         else:
             pauseOrResume = "--pause"
 
-        cmdStr="echo '%s' | $GPHOME/sbin/gpsuspend.py %s" % (gpconfigstrings, pauseOrResume)
+        cmdStr="echo '%s' | $HAWQ_HOME/sbin/gpsuspend.py %s" % (gpconfigstrings, pauseOrResume)
         Command.__init__(self,name,cmdStr,ctxt,remoteHost)
 
 #-----------------------------------------------
 class GpAddConfigScript(Command):
     def __init__(self, name, directorystring, entry, value=None, removeonly=False, ctxt=LOCAL, remoteHost=None):
-        cmdStr="echo '%s' | $GPHOME/sbin/gpaddconfig.py --entry %s" % (directorystring, entry)
+        cmdStr="echo '%s' | $HAWQ_HOME/sbin/gpaddconfig.py --entry %s" % (directorystring, entry)
         if value:
             # value will be encoded and unencoded in the script to protect against shell interpretation
             value = base64.urlsafe_b64encode(pickle.dumps(value))
@@ -929,7 +929,7 @@ class GpLogFilter(Command):
             cmdfrags.append('-t')
         cmdfrags.append(filename)
 
-        self.cmdStr = "$GPHOME/bin/gplogfilter %s" % ' '.join(cmdfrags)
+        self.cmdStr = "$HAWQ_HOME/bin/gplogfilter %s" % ' '.join(cmdfrags)
         Command.__init__(self, name, self.cmdStr, ctxt,remoteHost)
 
     @staticmethod
@@ -969,20 +969,20 @@ def get_user():
     return username
 
 
-def get_gphome():
-    logger.debug("Checking if GPHOME env variable is set.")
-    gphome=os.getenv('GPHOME',None)
-    if not gphome:
-        raise GpError('Environment Variable GPHOME not set')
-    return gphome
+def get_hawq_home():
+    logger.debug("Checking if HAWQ_HOME env variable is set.")
+    hawq_home=os.getenv('HAWQ_HOME',None)
+    if not hawq_home:
+        raise GpError('Environment Variable HAWQ_HOME not set')
+    return hawq_home
 
 
 ######
 def get_masterdatadir():
-    logger.debug("Checking if GPHOME env variable is set.")
-    HAWQ_CONFIG_DIR = os.environ.get('GPHOME')
+    logger.debug("Checking if HAWQ_HOME env variable is set.")
+    HAWQ_CONFIG_DIR = os.environ.get('HAWQ_HOME')
     if HAWQ_CONFIG_DIR is None:
-        raise GpError("Environment Variable GPHOME not set!")
+        raise GpError("Environment Variable HAWQ_HOME not set!")
     hawq_site = HawqXMLParser(HAWQ_CONFIG_DIR)
     master_datadir = hawq_site.get_value_from_name('hawq_master_directory').strip()
 
@@ -990,10 +990,10 @@ def get_masterdatadir():
 
 ######
 def get_master_port():
-    logger.debug("Checking if GPHOME env variable is set.")
-    HAWQ_CONFIG_DIR = os.environ.get('GPHOME')
+    logger.debug("Checking if HAWQ_HOME env variable is set.")
+    HAWQ_CONFIG_DIR = os.environ.get('HAWQ_HOME')
     if HAWQ_CONFIG_DIR is None:
-        raise GpError("Environment Variable GPHOME not set!")
+        raise GpError("Environment Variable HAWQ_HOME not set!")
     hawq_site = HawqXMLParser(HAWQ_CONFIG_DIR)
     master_port = hawq_site.get_value_from_name('hawq_master_address_port').strip()
 
@@ -1062,7 +1062,7 @@ def recovery_startup(datadir):
 
 # these match names from gp_bash_functions.sh
 def chk_gpdb_id(username):
-    path="%s/bin/initdb" % GPHOME
+    path="%s/bin/initdb" % HAWQ_HOME
     if not os.access(path,os.X_OK):
         raise GpError("File permission mismatch.  The current user %s does not have sufficient"
                       " privileges to run the Greenplum binaries and management utilities." % username )
@@ -1236,7 +1236,7 @@ class GpRecoverSeg(Command):
        self.ctxt = ctxt
        self.remoteHost = remoteHost
 
-       cmdStr = "$GPHOME/bin/gprecoverseg %s" % (options)
+       cmdStr = "$HAWQ_HOME/bin/gprecoverseg %s" % (options)
        Command.__init__(self,name,cmdStr,ctxt,remoteHost)
 
 

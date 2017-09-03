@@ -302,7 +302,7 @@ class ArchitectureSpecificTemplateManager:
     #  checking for entries provided by this file command
     #
     #
-        process = subprocess.Popen(["file", os.getenv("GPHOME", ".") + "/bin/postgres"], stdout=subprocess.PIPE)
+        process = subprocess.Popen(["file", os.getenv("HAWQ_HOME", ".") + "/bin/postgres"], stdout=subprocess.PIPE)
         process.wait()
         archString = process.communicate()[0].strip()
 

@@ -57,7 +57,7 @@ unset VERBOSE
 GP_USER=$USER_NAME
 EXIT_STATUS=0
 TMP_FILE=/tmp/${PROG_NAME}_dump_file_header.$$
-PYTHON=${GPHOME}/ext/python/bin/python
+PYTHON=${HAWQ_HOME}/ext/python/bin/python
 #******************************************************************************
 # Functions
 #******************************************************************************
@@ -169,8 +169,8 @@ if found == 0:
 END_PYTHON_CODE
 
 		LOG_MSG "[INFO][$INST_COUNT]:-Commencing data extract for $TAB_NAME on $QE_NAME $QE_DIR"
-		$TRUSTED_SHELL $QE_NAME ". $GPHOME/greenplum_path.sh; $CAT_CMD ${QE_DIR}/${GP_RESTORE_DIR}/$DUMP_FILE|$PYTHON -c '$PYTHON_CODE' ${ESCAPED_QUOTED_SCHEMA_TXT} ${ESCAPED_QUOTED_TAB_TXT} >> ${QE_DIR}/${GP_RESTORE_DIR}/$TAB_FILE" >> $LOG_FILE 2>&1
-		LOG_MSG "[INFO][$INST_COUNT]:-. $GPHOME/greenplum_path.sh; $CAT_CMD ${QE_DIR}/${GP_RESTORE_DIR}/$DUMP_FILE|$PYTHON -c '$PYTHON_CODE' ${ESCAPED_QUOTED_SCHEMA_TXT} ${ESCAPED_QUOTED_TAB_TXT}" >> $LOG_FILE
+		$TRUSTED_SHELL $QE_NAME ". $HAWQ_HOME/hawq_env.sh; $CAT_CMD ${QE_DIR}/${GP_RESTORE_DIR}/$DUMP_FILE|$PYTHON -c '$PYTHON_CODE' ${ESCAPED_QUOTED_SCHEMA_TXT} ${ESCAPED_QUOTED_TAB_TXT} >> ${QE_DIR}/${GP_RESTORE_DIR}/$TAB_FILE" >> $LOG_FILE 2>&1
+		LOG_MSG "[INFO][$INST_COUNT]:-. $HAWQ_HOME/hawq_env.sh; $CAT_CMD ${QE_DIR}/${GP_RESTORE_DIR}/$DUMP_FILE|$PYTHON -c '$PYTHON_CODE' ${ESCAPED_QUOTED_SCHEMA_TXT} ${ESCAPED_QUOTED_TAB_TXT}" >> $LOG_FILE
 		if [ $? -ne 0 ];then
 			LOG_MSG "[FATAL][$INST_COUNT]:-Failed to extract data for $TAB_NAME on $QE_NAME $QE_DIR"
 			$ECHO "FAILED${QE_LINE}:EXTRACT_DATA_FAIL" >> $PARALLEL_STATUS_FILE
@@ -207,8 +207,8 @@ while getopts ":v'?'" opt
 done
 #Now process supplied call parameters
 #Setting APP_PATH
-if [ x"" != x"$GPHOME" ];then
-        APP_PATH=${GPHOME}/bin
+if [ x"" != x"$HAWQ_HOME" ];then
+        APP_PATH=${HAWQ_HOME}/bin
 else
         APP_PATH=${BIZHOME}/bin
 fi

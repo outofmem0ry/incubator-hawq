@@ -187,7 +187,7 @@ clean :
 
 distclean: clean
 
-SKIP_INSTALL=.epydoc.config|.gitignore|.p4ignore|.rcfile|Makefile|generate-greenplum-path.sh
+SKIP_INSTALL=.epydoc.config|.gitignore|.p4ignore|.rcfile|Makefile|generate-hawq-env.sh
 install: all
 	${INSTALL_SCRIPT} -d ${DESTDIR}${bindir}
 	for files in `find * -maxdepth 0 -type f | grep -x -v -E "${SKIP_INSTALL}"`; do ${INSTALL_SCRIPT} $${files} ${DESTDIR}${bindir}; done
@@ -196,4 +196,4 @@ install: all
 	${MAKE} -C ext $@
 	${INSTALL_SCRIPT} -d ${DESTDIR}${bindir}/lib
 	for files in `find lib -type f`; do ${INSTALL_SCRIPT} $${files} ${DESTDIR}${bindir}/lib; done
-	unset LIBPATH; ./generate-greenplum-path.sh $(prefix) > ${DESTDIR}${prefix}/greenplum_path.sh
+	unset LIBPATH; ./generate-hawq-env.sh $(prefix) > ${DESTDIR}${prefix}/hawq_env.sh

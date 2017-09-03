@@ -41,7 +41,7 @@ try:
     from gppylib.gpcoverage import GpCoverage
     from gppylib.commands import gp
 except ImportError, e:    
-    sys.exit('ERROR: Cannot import modules.  Please check that you have sourced greenplum_path.sh.  Detail: ' + str(e))
+    sys.exit('ERROR: Cannot import modules.  Please check that you have sourced hawq_env.sh.  Detail: ' + str(e))
 
 # These values are from src/backend/po/*.po
 TROUBLE_VALUES=[

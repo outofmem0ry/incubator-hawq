@@ -26,7 +26,7 @@ sub getArch
 {
     my @conf = @_;
 
-    open(FILE, "file $ENV{'GPHOME'}/bin/postgres |") || die;
+    open(FILE, "file $ENV{'HAWQ_HOME'}/bin/postgres |") || die;
     my ($file) = <FILE>;
     close FILE;
 

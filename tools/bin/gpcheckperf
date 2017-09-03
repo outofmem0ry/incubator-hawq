@@ -60,9 +60,9 @@ except ImportError, e:
     sys.exit('Error: unable to import module: ' + str(e))
 
 
-GPHOME=os.getenv('GPHOME')
-if GPHOME is None:
-    sys.exit('Please set GPHOME environment variable')
+HAWQ_HOME=os.getenv('HAWQ_HOME')
+if HAWQ_HOME is None:
+    sys.exit('Please set HAWQ_HOME environment variable')
 
 USER=os.getenv('USER')
 if USER is None or USER is ' ':
@@ -107,7 +107,7 @@ def strcmd(cmd):
 
 #############
 def gpssh(cmd):
-    c = ['%s/bin/gpssh' % GPHOME]
+    c = ['%s/bin/gpssh' % HAWQ_HOME]
     if (GV.opt['-V']): c.append('-v')
     if (GV.opt['-f']):
         c.append('-f')
@@ -126,7 +126,7 @@ def gpssh(cmd):
 
 #############
 def gpscp(src, dst):
-    c = ['%s/bin/gpscp' % GPHOME]
+    c = ['%s/bin/gpscp' % HAWQ_HOME]
     if (GV.opt['-V']): c.append('-v')
     if (GV.opt['-f']):
         c.append('-f')

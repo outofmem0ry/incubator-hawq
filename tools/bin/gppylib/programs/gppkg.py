@@ -37,7 +37,7 @@ try:
 
     import yaml
 except ImportError, ex:
-    sys.exit('Cannot import modules.  Please check that you have sourced greenplum_path.sh.  Detail: ' + str(ex))
+    sys.exit('Cannot import modules.  Please check that you have sourced hawq_env.sh.  Detail: ' + str(ex))
 
 logger = gplog.get_default_logger()
 
@@ -84,7 +84,7 @@ class GpPkgProgram:
                 self.query = (None, args[0])   
         elif self.migrate:
             if len(args) != 2:
-                raise ExceptionNoStackTraceNeeded('Invalid syntax, expecting "gppkg --migrate <from_gphome> <to_gphome>".')
+                raise ExceptionNoStackTraceNeeded('Invalid syntax, expecting "gppkg --migrate <from_hawq_home> <to_hawq_home>".')
             self.migrate = (args[0], args[1])
 
     @staticmethod
@@ -112,7 +112,7 @@ class GpPkgProgram:
         add_to.add_option('-q', '--query', help='query the gppkg database or a particular gppkg', action='store_true')
         add_to.add_option('-b', '--build', help='build a gppkg', metavar='<directory>')
         add_to.add_option('-c', '--clean', help='clean the cluster of the given gppkg', action='store_true')
-        add_to.add_option('--migrate', help='migrate gppkgs from a separate $GPHOME', metavar='<from_gphome> <to_gphome>', action='store_true', default=False)
+        add_to.add_option('--migrate', help='migrate gppkgs from a separate $HAWQ_HOME', metavar='<from_hawq_home> <to_hawq_home>', action='store_true', default=False)
 
         add_to = OptionGroup(parser, 'Query Options')
         parser.add_option_group(add_to)
@@ -142,11 +142,11 @@ class GpPkgProgram:
         logger.debug('_get_gpdb_host_list')
         
         #Get host list
-        GPHOME = os.getenv('GPHOME')
-        if GPHOME == '' or not GPHOME:
-            logger.info('GPHOME is not set.')
+        HAWQ_HOME = os.getenv('HAWQ_HOME')
+        if HAWQ_HOME == '' or not HAWQ_HOME:
+            logger.info('HAWQ_HOME is not set.')
             sys.exit(1)
-        hawq_site = HawqXMLParser(GPHOME)
+        hawq_site = HawqXMLParser(HAWQ_HOME)
         hawq_site.get_all_values()
         master_port = hawq_site.hawq_dict['hawq_master_address_port']
         master_host = ""
@@ -210,8 +210,8 @@ class GpPkgProgram:
                 raise ExceptionNoStackTraceNeeded('gppkg requires RPM to be available in PATH') 
 
         if self.migrate:
-            MigratePackages(from_gphome = self.migrate[0],
-                            to_gphome = self.migrate[1]).run()
+            MigratePackages(from_hawq_home = self.migrate[0],
+                            to_hawq_home = self.migrate[1]).run()
             return
 
         # MASTER_DATA_DIRECTORY and PGPORT must not need to be set for 

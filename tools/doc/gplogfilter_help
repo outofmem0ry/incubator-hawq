@@ -31,7 +31,7 @@ files at once by running it through the hawq ssh utility. For example,
 to display the last three lines of each segment log file:
 
       hawq ssh -f seg_host_file
-            => source /usr/local/hawq/greenplum_path.sh
+            => source /usr/local/hawq/hawq_env.sh
             => gplogfilter -n 3 /data/hawq/segment/pg_log/hawq-*
 
 By default, the output of gplogfilter is sent to standard output. 
@@ -199,7 +199,7 @@ for log messages in the segment log files containing the string
 'con6' and save output to a file.
 
 hawq ssh -f seg_hosts_file -e 'source 
-/usr/local/hawq/greenplum_path.sh ; gplogfilter -f 
+/usr/local/hawq/hawq_env.sh ; gplogfilter -f 
 con6 /data/hawq/segment/pg_log/hawq-*' > seglog.out
 
 

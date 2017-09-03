@@ -16,8 +16,8 @@
 # specific language governing permissions and limitations
 # under the License.
 
-source ${GPHOME}/bin/lib/hawq_bash_functions.sh
-#SOURCE_PATH="source ${GPHOME}/greenplum_path.sh"
+source ${HAWQ_HOME}/bin/lib/hawq_bash_functions.sh
+#SOURCE_PATH="source ${HAWQ_HOME}/hawq_env.sh"
 #${SOURCE_PATH}
 hostname="$1"
 host_parameter_name="$2"
@@ -82,4 +82,4 @@ for host_ip in ${ip_address_all}; do
     all_ip_inline="${all_ip_inline} ${host_ip}"
 done
 
-echo "${host_parameter_name}=\"${all_ip_inline}\"" >> ${GPHOME}/etc/_mgmt_config
+echo "${host_parameter_name}=\"${all_ip_inline}\"" >> ${HAWQ_HOME}/etc/_mgmt_config

@@ -17,13 +17,13 @@
 # under the License.
 
 object_type=$1
-GPHOME=$2
+HAWQ_HOME=$2
 VERBOSE=0
 if [ "$3" == "1" ]; then
     VERBOSE=1
 fi
-source ${GPHOME}/bin/lib/hawq_bash_functions.sh
-SOURCE_PATH="source ${GPHOME}/greenplum_path.sh"
+source ${HAWQ_HOME}/bin/lib/hawq_bash_functions.sh
+SOURCE_PATH="source ${HAWQ_HOME}/hawq_env.sh"
 ${SOURCE_PATH}
 
 host_name=`${HOSTNAME}`
@@ -65,7 +65,7 @@ else
 
 fi
 
-mgmt_config_file=${GPHOME}/etc/_mgmt_config
+mgmt_config_file=${HAWQ_HOME}/etc/_mgmt_config
 if [ -f ${mgmt_config_file} ]; then
     source ${mgmt_config_file} > /dev/null 2>&1
 else
@@ -119,8 +119,8 @@ STANDBY_LOG_FILE=${log_filename}
 SEGMENT_LOG_FILE=${log_filename}
 LOG_FILE=${log_filename}
 
-PSQL=${GPHOME}/bin/psql
-PG_CTL=${GPHOME}/bin/pg_ctl
+PSQL=${HAWQ_HOME}/bin/psql
+PG_CTL=${HAWQ_HOME}/bin/pg_ctl
 if [ "${log_dir}" = "None" ]; then
     log_dir=${HOME}/hawqAdminLogs
 fi
@@ -163,7 +163,7 @@ LOAD_GP_TOOLKIT () {
         exit 1
     fi
 
-    ${CAT} $GPHOME/share/postgresql/gp_toolkit.sql >> ${TOOLKIT_FILE} 2>&1
+    ${CAT} $HAWQ_HOME/share/postgresql/gp_toolkit.sql >> ${TOOLKIT_FILE} 2>&1
     RETVAL=$?
     if [ $RETVAL -ne 0 ];then
         ${ECHO} "[FATAL]:-Failed to create the hawq_toolkit sql file." | tee -a ${MASTER_LOG_FILE}
@@ -233,7 +233,7 @@ update_standby_pg_hba(){
                       "${ECHO} \"host  all     ${USER}    ${CIDR_MASTER_IP}       trust\" >> ${master_data_directory}/${PG_HBA}"
         fi
 
-        for segment_host_name in `cat ${GPHOME}/etc/slaves`; do
+        for segment_host_name in `cat ${HAWQ_HOME}/etc/slaves`; do
             ${SSH} -o 'StrictHostKeyChecking no' ${hawqUser}@${segment_host_name} \
                       "if [ -e ${segment_data_directory}/${PG_HBA} ]; then ${ECHO} \"host  all     all    ${CIDR_MASTER_IP}       trust\" >> ${segment_data_directory}/${PG_HBA}; fi"
         done
@@ -262,7 +262,7 @@ update_segment_pg_hba(){
 }
 
 master_init() {
-    ${GPHOME}/bin/initdb -E UNICODE -D ${hawq_data_directory} --locale=${locale} --lc-collate=${hawq_lc_collate} \
+    ${HAWQ_HOME}/bin/initdb -E UNICODE -D ${hawq_data_directory} --locale=${locale} --lc-collate=${hawq_lc_collate} \
         --lc-ctype=${hawq_lc_ctype} --lc-messages=${hawq_lc_messages} --lc-monetary=${hawq_lc_monetary} \
         --lc-numeric=${hawq_lc_numeric} --lc-time=${hawq_lc_time} --max_connections=${master_max_connections} \
         --shared_buffers=${shared_buffers} --backend_output=${log_dir}/master.initdb 1>>${MASTER_LOG_FILE} 2>&1
@@ -363,7 +363,7 @@ standby_init() {
     LOG_MSG "[INFO]:-Sync files to standby from master" verbose
     ${SSH} -o 'StrictHostKeyChecking no' ${hawqUser}@${master_host_name} \
         "cd ${master_data_directory}; \
-         ${SOURCE_PATH}; ${GPHOME}/bin/lib/pysync.py -x gpperfmon/data -x pg_log -x db_dumps \
+         ${SOURCE_PATH}; ${HAWQ_HOME}/bin/lib/pysync.py -x gpperfmon/data -x pg_log -x db_dumps \
          ${master_data_directory} ${standby_host_name}:${master_data_directory};" >> ${STANDBY_LOG_FILE} 2>&1
     if [ $? -ne 0 ] ; then
         LOG_MSG "[FATAL]:-Sync master files to standby failed" verbose
@@ -446,7 +446,7 @@ standby_init() {
 }
 
 segment_init() {
-    source ${GPHOME}/greenplum_path.sh
+    source ${HAWQ_HOME}/hawq_env.sh
     for tmp_path in `${ECHO} ${hawqSegmentTemp} | sed 's|,| |g'`; do
         if [ ! -d ${tmp_path} ]; then
             LOG_MSG "[ERROR]:-Temp directory is not exist, please create it" verbose
@@ -460,9 +460,9 @@ segment_init() {
            fi
         fi
     done
-    export LD_LIBRARY_PATH=${GPHOME}/lib:${GPHOME}/ext/python/lib:${LD_LIBRARY_PATH}
+    export LD_LIBRARY_PATH=${HAWQ_HOME}/lib:${HAWQ_HOME}/ext/python/lib:${LD_LIBRARY_PATH}
 
-    ${GPHOME}/bin/initdb -E UNICODE -D ${hawq_data_directory} --locale=${locale} --lc-collate=${hawq_lc_collate} \
+    ${HAWQ_HOME}/bin/initdb -E UNICODE -D ${hawq_data_directory} --locale=${locale} --lc-collate=${hawq_lc_collate} \
          --lc-ctype=${hawq_lc_ctype} --lc-messages=${hawq_lc_messages} --lc-monetary=${hawq_lc_monetary} \
          --lc-numeric=${hawq_lc_numeric} --lc-time=${hawq_lc_time} --max_connections=${segment_max_connections} \
          --shared_buffers=${shared_buffers} --backend_output=${log_dir}/segment.initdb 1>>${SEGMENT_LOG_FILE} 2>&1

@@ -393,16 +393,16 @@ static void usage_error(const char* msg, int print_usage)
 {
 	if (print_usage)
 	{
-		char* GPHOME = 0;
+		char* HAWQ_HOME = 0;
 		FILE* fp = 0;
 
-		if (gcb.pool && apr_env_get(&GPHOME, "GPHOME", gcb.pool))
-			GPHOME = 0;
+		if (gcb.pool && apr_env_get(&HAWQ_HOME, "HAWQ_HOME", gcb.pool))
+			HAWQ_HOME = 0;
 
-		if (GPHOME)
+		if (HAWQ_HOME)
 		{
 			char* path = apr_psprintf(gcb.pool, "%s/docs/cli_help/gpfdist_help",
-					GPHOME);
+					HAWQ_HOME);
 			if (path)
 				fp = fopen(path, "r");
 		}

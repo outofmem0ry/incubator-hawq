@@ -30,12 +30,12 @@ CACHEFILE = os.path.join(FILEDIR, FILENAME)
 logger = gplog.get_unittest_logger()
 
 try:
-    if os.getenv('GPHOME') is '':
-        raise Exception("Environment variable GPHOME not set")
+    if os.getenv('HAWQ_HOME') is '':
+        raise Exception("Environment variable HAWQ_HOME not set")
 except Exception, e:
     sys.stderr.write("Exception found: %s \n" % str(e))
 
-GPHOSTLOOKUP = os.path.join(os.getenv('GPHOME'), 'bin/lib/', 'gphostcachelookup.py')
+GPHOSTLOOKUP = os.path.join(os.getenv('HAWQ_HOME'), 'bin/lib/', 'gphostcachelookup.py')
 
 class GpHostCacheLookupTestCase(unittest.TestCase):
 

@@ -31,7 +31,7 @@ The client machine where hawq load is executed must have the following:
   (available from www.python.org).
 
 * The gpfdist parallel file distribution program installed and 
-  in your $PATH. This program is located in $GPHOME/bin of your 
+  in your $PATH. This program is located in $HAWQ_HOME/bin of your 
   HAWQ server installation.
 
 * Network access to and from all hosts in your HAWQ array 

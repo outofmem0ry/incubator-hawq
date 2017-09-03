@@ -20,10 +20,10 @@ import sys, os, pwd
 import unittest2 as unittest
 
 try:
-    gphome = os.environ.get('GPHOME')
-    if not gphome:
-        raise Exception("GPHOME not set")
-    location = "%s/bin/lib" % gphome
+    hawq_home = os.environ.get('HAWQ_HOME')
+    if not hawq_home:
+        raise Exception("HAWQ_HOME not set")
+    location = "%s/bin/lib" % hawq_home
     sys.path.append(location)
     from gppylib.util.ssh_utils import HostList, Session
 except Exception as e:

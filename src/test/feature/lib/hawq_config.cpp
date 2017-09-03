@@ -33,7 +33,7 @@ namespace hawq {
 namespace test {
 
 bool HawqConfig::LoadFromConfigFile() {
-  const char *env = getenv("GPHOME");
+  const char *env = getenv("HAWQ_HOME");
   string confPath = env ? env : "";
   if (!confPath.empty()) {
     confPath.append("/etc/hawq-site.xml");
@@ -81,11 +81,11 @@ void HawqConfig::getTotalSegments(std::vector<string> &hostname,
 void HawqConfig::getSlaves(std::vector<string> &hostname) {
   hostname.resize(0);
   std::ifstream inFile;
-  char *GPHOME = getenv("GPHOME");
-  if (GPHOME == nullptr) {
+  char *HAWQ_HOME = getenv("HAWQ_HOME");
+  if (HAWQ_HOME == nullptr) {
     return;
   }
-  string slaveFile(GPHOME);
+  string slaveFile(HAWQ_HOME);
   slaveFile.append("/etc/slaves");
   inFile.open(slaveFile.c_str());
   string line;

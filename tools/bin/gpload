@@ -16,11 +16,11 @@
 # specific language governing permissions and limitations
 # under the License.
 
-if [ ! -z "$GPHOME" ]; then
-    . $GPHOME/greenplum_path.sh
+if [ ! -z "$HAWQ_HOME" ]; then
+    . $HAWQ_HOME/hawq_env.sh
 fi
-if [ ! -z "$GPHOME_LOADERS" ]; then
-    . $GPHOME_LOADERS/greenplum_loaders_path.sh
+if [ ! -z "$HAWQ_HOME_LOADERS" ]; then
+    . $HAWQ_HOME_LOADERS/greenplum_loaders_path.sh
 fi
 if [ `uname -s` = "AIX" -a ! -z "$GP_LIBPATH_FOR_PYTHON" ]; then
     LIBPATH=$GP_LIBPATH_FOR_PYTHON:$LIBPATH

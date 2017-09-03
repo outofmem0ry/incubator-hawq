@@ -501,7 +501,7 @@ class HAWQArray:
         hawq_major_version = version.getVersionRelease().split('.')[0]
         if hawq_major_version == '2':
 
-            hawq_site = HawqXMLParser(GPHOME)
+            hawq_site = HawqXMLParser(HAWQ_HOME)
             master_data_directory  = hawq_site.get_value_from_name('hawq_master_directory')
             segment_data_directory = hawq_site.get_value_from_name('hawq_segment_directory')
 

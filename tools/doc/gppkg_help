@@ -11,7 +11,7 @@ SYNOPSIS
 gppkg [-i <package>| -u <package> | -r <name-version> | -c] 
 [-d <master_data_directory>] [-a] [-v]
 
-gppkg --migrate <GPHOME_1> <GPHOME_2> [-a] [-v]
+gppkg --migrate <HAWQ_HOME_1> <HAWQ_HOME_2> [-a] [-v]
 
 gppkg [-q | --query] query_option
 
@@ -68,8 +68,8 @@ The master data directory. If not specified, the value set
 Installs the given package. This includes any pre/post 
 installation steps and installation of any dependencies.
 
---migrate <GPHOME_1> <GPHOME_2>
-Migrates packages from a separate $GPHOME. Carries over 
+--migrate <HAWQ_HOME_1> <HAWQ_HOME_2>
+Migrates packages from a separate $HAWQ_HOME. Carries over 
 packages from one version of Greenplum Database to another.
 For example: 
   gppkg --migrate /usr/local/greenplum-db-4.2.0.1 
@@ -81,8 +81,8 @@ cases when the user wants to migrate packages
 manually.
 Migration can only proceed if gppkg is executed 
 from the installation directory to which packages 
-are being migrated. That is, GPHOME_2 must match 
-the $GPHOME from which the currently executing 
+are being migrated. That is, HAWQ_HOME_2 must match 
+the $HAWQ_HOME from which the currently executing 
 gppkg is being run. 
 
 -q | --query query_option

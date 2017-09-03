@@ -111,8 +111,8 @@ driver.initOneHostConfiguration()
 test_main( "faultPrimaryNoArgs", ["--host", "this-is-my-host", "--role", "primary"], parserFn, commandFn, \
           [TempFileLogger(0,driver)], \
 """Injecting fault on 2 segment(s)
-exec $GPHOME/bin/gp_primarymirror -h this-is-my-host -p 50001 -i /tmp/temporaryNamedFile0
-exec $GPHOME/bin/gp_primarymirror -h this-is-my-host -p 50002 -i /tmp/temporaryNamedFile0
+exec $HAWQ_HOME/bin/gp_primarymirror -h this-is-my-host -p 50001 -i /tmp/temporaryNamedFile0
+exec $HAWQ_HOME/bin/gp_primarymirror -h this-is-my-host -p 50002 -i /tmp/temporaryNamedFile0
 sys.exit 0
 BEGIN File 0:
 faultInject
@@ -139,8 +139,8 @@ test_main( "faultPrimarySomeArgs", ["--host", "this-is-my-host", "--role", "mirr
             ], parserFn, commandFn, \
           [TempFileLogger(0,driver)], \
 """Injecting fault on 2 segment(s)
-exec $GPHOME/bin/gp_primarymirror -h this-is-my-host -p 60001 -i /tmp/temporaryNamedFile0
-exec $GPHOME/bin/gp_primarymirror -h this-is-my-host -p 60002 -i /tmp/temporaryNamedFile0
+exec $HAWQ_HOME/bin/gp_primarymirror -h this-is-my-host -p 60001 -i /tmp/temporaryNamedFile0
+exec $HAWQ_HOME/bin/gp_primarymirror -h this-is-my-host -p 60002 -i /tmp/temporaryNamedFile0
 sys.exit 0
 BEGIN File 0:
 faultInject
@@ -165,12 +165,12 @@ test_main( "invalidRole", ["--host", "unknown", "--role", "primary", "-m", "fun"
 driver.initOneHostConfiguration()
 
 # the first one will finish on the 15th query
-addCommandSimulator("$GPHOME/bin/gp_primarymirror -h this-is-my-host -p 60001 -i /tmp/temporaryNamedFile1",
+addCommandSimulator("$HAWQ_HOME/bin/gp_primarymirror -h this-is-my-host -p 60001 -i /tmp/temporaryNamedFile1",
         CommandSimulatorForTest([ CommandSimulatorCommand([], ["Success: waitMore"], 0, 14),
                                   CommandSimulatorCommand([], ["Success: done"], 0, 1)]))
 
 # the second one will finish on the second query
-addCommandSimulator("$GPHOME/bin/gp_primarymirror -h this-is-my-host -p 60002 -i /tmp/temporaryNamedFile1",
+addCommandSimulator("$HAWQ_HOME/bin/gp_primarymirror -h this-is-my-host -p 60002 -i /tmp/temporaryNamedFile1",
                     CommandSimulatorForTest([ CommandSimulatorCommand([], ["Success: waitMore"], 0, 1),
                                               CommandSimulatorCommand([], ["Success: done"], 0, 1)]))
 
@@ -185,40 +185,40 @@ test_main( "syncTest", ["--mode", "sync", "--host", "this-is-my-host", "--role",
             ], parserFn, commandFn, \
           [TempFileLogger(1,driver)], \
 """Injecting fault on 2 segment(s)
-exec $GPHOME/bin/gp_primarymirror -h this-is-my-host -p 60001 -i /tmp/temporaryNamedFile0
-exec $GPHOME/bin/gp_primarymirror -h this-is-my-host -p 60002 -i /tmp/temporaryNamedFile0
+exec $HAWQ_HOME/bin/gp_primarymirror -h this-is-my-host -p 60001 -i /tmp/temporaryNamedFile0
+exec $HAWQ_HOME/bin/gp_primarymirror -h this-is-my-host -p 60002 -i /tmp/temporaryNamedFile0
 Sleeping (seconds): 0.12
-exec $GPHOME/bin/gp_primarymirror -h this-is-my-host -p 60001 -i /tmp/temporaryNamedFile1
-exec $GPHOME/bin/gp_primarymirror -h this-is-my-host -p 60002 -i /tmp/temporaryNamedFile1
+exec $HAWQ_HOME/bin/gp_primarymirror -h this-is-my-host -p 60001 -i /tmp/temporaryNamedFile1
+exec $HAWQ_HOME/bin/gp_primarymirror -h this-is-my-host -p 60002 -i /tmp/temporaryNamedFile1
 Sleeping (seconds): 0.17
-exec $GPHOME/bin/gp_primarymirror -h this-is-my-host -p 60001 -i /tmp/temporaryNamedFile1
-exec $GPHOME/bin/gp_primarymirror -h this-is-my-host -p 60002 -i /tmp/temporaryNamedFile1
+exec $HAWQ_HOME/bin/gp_primarymirror -h this-is-my-host -p 60001 -i /tmp/temporaryNamedFile1
+exec $HAWQ_HOME/bin/gp_primarymirror -h this-is-my-host -p 60002 -i /tmp/temporaryNamedFile1
 Sleeping (seconds): 0.26
-exec $GPHOME/bin/gp_primarymirror -h this-is-my-host -p 60001 -i /tmp/temporaryNamedFile1
+exec $HAWQ_HOME/bin/gp_primarymirror -h this-is-my-host -p 60001 -i /tmp/temporaryNamedFile1
 Sleeping (seconds): 0.39
-exec $GPHOME/bin/gp_primarymirror -h this-is-my-host -p 60001 -i /tmp/temporaryNamedFile1
+exec $HAWQ_HOME/bin/gp_primarymirror -h this-is-my-host -p 60001 -i /tmp/temporaryNamedFile1
 Sleeping (seconds): 0.59
-exec $GPHOME/bin/gp_primarymirror -h this-is-my-host -p 60001 -i /tmp/temporaryNamedFile1
+exec $HAWQ_HOME/bin/gp_primarymirror -h this-is-my-host -p 60001 -i /tmp/temporaryNamedFile1
 Sleeping (seconds): 0.88
-exec $GPHOME/bin/gp_primarymirror -h this-is-my-host -p 60001 -i /tmp/temporaryNamedFile1
+exec $HAWQ_HOME/bin/gp_primarymirror -h this-is-my-host -p 60001 -i /tmp/temporaryNamedFile1
 Sleeping (seconds): 1.32
-exec $GPHOME/bin/gp_primarymirror -h this-is-my-host -p 60001 -i /tmp/temporaryNamedFile1
+exec $HAWQ_HOME/bin/gp_primarymirror -h this-is-my-host -p 60001 -i /tmp/temporaryNamedFile1
 Sleeping (seconds): 1.98
-exec $GPHOME/bin/gp_primarymirror -h this-is-my-host -p 60001 -i /tmp/temporaryNamedFile1
+exec $HAWQ_HOME/bin/gp_primarymirror -h this-is-my-host -p 60001 -i /tmp/temporaryNamedFile1
 Sleeping (seconds): 2.96
-exec $GPHOME/bin/gp_primarymirror -h this-is-my-host -p 60001 -i /tmp/temporaryNamedFile1
+exec $HAWQ_HOME/bin/gp_primarymirror -h this-is-my-host -p 60001 -i /tmp/temporaryNamedFile1
 Sleeping (seconds): 4.44
-exec $GPHOME/bin/gp_primarymirror -h this-is-my-host -p 60001 -i /tmp/temporaryNamedFile1
+exec $HAWQ_HOME/bin/gp_primarymirror -h this-is-my-host -p 60001 -i /tmp/temporaryNamedFile1
 Sleeping (seconds): 6.67
-exec $GPHOME/bin/gp_primarymirror -h this-is-my-host -p 60001 -i /tmp/temporaryNamedFile1
+exec $HAWQ_HOME/bin/gp_primarymirror -h this-is-my-host -p 60001 -i /tmp/temporaryNamedFile1
 Sleeping (seconds): 10.00
-exec $GPHOME/bin/gp_primarymirror -h this-is-my-host -p 60001 -i /tmp/temporaryNamedFile1
+exec $HAWQ_HOME/bin/gp_primarymirror -h this-is-my-host -p 60001 -i /tmp/temporaryNamedFile1
 Sleeping (seconds): 10.00
-exec $GPHOME/bin/gp_primarymirror -h this-is-my-host -p 60001 -i /tmp/temporaryNamedFile1
+exec $HAWQ_HOME/bin/gp_primarymirror -h this-is-my-host -p 60001 -i /tmp/temporaryNamedFile1
 Sleeping (seconds): 10.00
-exec $GPHOME/bin/gp_primarymirror -h this-is-my-host -p 60001 -i /tmp/temporaryNamedFile1
+exec $HAWQ_HOME/bin/gp_primarymirror -h this-is-my-host -p 60001 -i /tmp/temporaryNamedFile1
 Sleeping (seconds): 10.00
-exec $GPHOME/bin/gp_primarymirror -h this-is-my-host -p 60001 -i /tmp/temporaryNamedFile1
+exec $HAWQ_HOME/bin/gp_primarymirror -h this-is-my-host -p 60001 -i /tmp/temporaryNamedFile1
 sys.exit 0
 BEGIN File 1:
 getFaultInjectStatus
@@ -234,8 +234,8 @@ test_main( "syncNoWaitTest1", ["--mode", "sync", "--host", "this-is-my-host", "-
             "-t", "table10", "-o", "55", "-z", "11" \
             ], parserFn, commandFn, None, \
 """Injecting fault on 2 segment(s)
-exec $GPHOME/bin/gp_primarymirror -h this-is-my-host -p 60001 -i /tmp/temporaryNamedFile0
-exec $GPHOME/bin/gp_primarymirror -h this-is-my-host -p 60002 -i /tmp/temporaryNamedFile0
+exec $HAWQ_HOME/bin/gp_primarymirror -h this-is-my-host -p 60001 -i /tmp/temporaryNamedFile0
+exec $HAWQ_HOME/bin/gp_primarymirror -h this-is-my-host -p 60002 -i /tmp/temporaryNamedFile0
 sys.exit 0"""
 )
 driver.initOneHostConfiguration()
@@ -244,8 +244,8 @@ test_main( "syncNoWaitTest2", ["--mode", "sync", "--host", "this-is-my-host", "-
             "-t", "table10", "-o", "55", "-z", "11" \
             ], parserFn, commandFn, None, \
 """Injecting fault on 2 segment(s)
-exec $GPHOME/bin/gp_primarymirror -h this-is-my-host -p 60001 -i /tmp/temporaryNamedFile0
-exec $GPHOME/bin/gp_primarymirror -h this-is-my-host -p 60002 -i /tmp/temporaryNamedFile0
+exec $HAWQ_HOME/bin/gp_primarymirror -h this-is-my-host -p 60001 -i /tmp/temporaryNamedFile0
+exec $HAWQ_HOME/bin/gp_primarymirror -h this-is-my-host -p 60002 -i /tmp/temporaryNamedFile0
 sys.exit 0"""
 )
 

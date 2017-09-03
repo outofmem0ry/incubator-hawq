@@ -52,8 +52,8 @@ class GpMasterEnvironment:
         self.__masterMaxConnections = pgconf_dict.int('max_connections')
         logger.debug("Read from postgresql.conf max_connections=%s" % self.__masterMaxConnections)
 
-        self.__gpHome = gp.get_gphome()
-        self.__gpVersion = gp.GpVersion.local('local GP software version check',self.__gpHome)
+        self.__hawqHome = gp.get_hawq_home()
+        self.__gpVersion = gp.GpVersion.local('local GP software version check',self.__hawqHome)
         logger.info("local HAWQ Version: '%s'" % self.__gpVersion)
 
         # read collation settings from master
@@ -77,7 +77,7 @@ class GpMasterEnvironment:
             self.__pgVersion = None
 
 
-    def getGpHome(self): return self.__gpHome
+    def getHawqHome(self): return self.__hawqHome
     def getGpVersion(self): return self.__gpVersion
     def getPgVersion(self): return self.__pgVersion
     def getLcCollate(self):

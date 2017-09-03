@@ -29,7 +29,7 @@ try:
     from gppylib.gpparseopts import OptParser, OptChecker
     from gppylib.commands.unix import SYSTEM
 except ImportError, e:    
-    sys.exit('Cannot import modules.  Please check that you have sourced greenplum_path.sh.  Detail: ' + str(e))
+    sys.exit('Cannot import modules.  Please check that you have sourced hawq_env.sh.  Detail: ' + str(e))
 
 class BytesFormatter:
     BYTES = 1
@@ -155,9 +155,9 @@ def getDirectoryList():
 ###### main()
 if __name__ == '__main__':
 
-    gphome = os.environ.get('GPHOME')
-    if not gphome:
-        print "GPHOME not set"
+    hawq_home = os.environ.get('HAWQ_HOME')
+    if not hawq_home:
+        print "HAWQ_HOME not set"
         sys.exit(1)
 
     parser = OptParser(option_class=OptChecker)

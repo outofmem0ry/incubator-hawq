@@ -82,8 +82,8 @@ exit 0
 
 %post
 INSTDIR=$RPM_INSTALL_PREFIX0/%{name}
-# Update GPHOME in greenplum_path.sh
-sed "s|^GPHOME=.*|GPHOME=${INSTDIR}|g" -i ${INSTDIR}/greenplum_path.sh
+# Update HAWQ_HOME in hawq_env.sh
+sed "s|^HAWQ_HOME=.*|HAWQ_HOME=${INSTDIR}|g" -i ${INSTDIR}/hawq_env.sh
 
 %postun
 

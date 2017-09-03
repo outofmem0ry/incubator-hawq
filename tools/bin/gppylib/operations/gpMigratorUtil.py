@@ -158,9 +158,9 @@ class GPUpgradeBase(object):
         self.masterport = 5432    # Master Port
         self.mirrors    = []       # list of mirrors
         self.newenv    = None     # enviornment: new gp env
-        self.newhome   = None     # New gphome/bin directory
+        self.newhome   = None     # New hawq_home/bin directory
         self.oldenv    = None     # enviornment: old gp env
-        self.oldhome   = None     # Old gphome/bin directory
+        self.oldhome   = None     # Old hawq_home/bin directory
         self.option    = None     # Argument passed to cmd
         self.path      = None     # Default path
         self.pool      = None     # worker pool
@@ -214,7 +214,7 @@ class GPUpgradeBase(object):
 
 
     #------------------------------------------------------------
-    def SetupEnv(self, gphome, masterdir):
+    def SetupEnv(self, hawq_home, masterdir):
         '''
         Sets up environment variables for Greenplum Administration
         '''
@@ -222,28 +222,28 @@ class GPUpgradeBase(object):
         lpath = os.environ.get('LD_LIBRARY_PATH')
         dypath = os.environ.get('DYLD_LIBRARY_PATH')
 
-        # Add $GPHOME/bin to the path for this environment
-        path = '%s/bin:%s/ext/python/bin:%s' % (gphome, gphome, self.path)
+        # Add $HAWQ_HOME/bin to the path for this environment
+        path = '%s/bin:%s/ext/python/bin:%s' % (hawq_home, hawq_home, self.path)
 
         if lpath:
-            lpath = '%s/lib:%s/ext/python/lib:%s' % (gphome, gphome, lpath)
+            lpath = '%s/lib:%s/ext/python/lib:%s' % (hawq_home, hawq_home, lpath)
         else:
-            lpath = '%s/lib:%s/ext/python/lib' % (gphome, gphome)
+            lpath = '%s/lib:%s/ext/python/lib' % (hawq_home, hawq_home)
         if dypath:
-            dypath = '%s/lib:%s/ext/python/lib:%s' % (gphome, gphome, dypath)
+            dypath = '%s/lib:%s/ext/python/lib:%s' % (hawq_home, hawq_home, dypath)
         else:
-            dypath = '%s/lib:%s/ext/python/lib' % (gphome, gphome)
+            dypath = '%s/lib:%s/ext/python/lib' % (hawq_home, hawq_home)
 
         env = {}
         env['HOME']    = home
         env['USER']    = self.user
         env['LOGNAME'] = self.user
-        env['GPHOME']  = gphome
+        env['HAWQ_HOME']  = hawq_home
         env['PATH']    = path
         env['LD_LIBRARY_PATH'] = lpath
         env['DYLD_LIBRARY_PATH'] = dypath
-        env['PYTHONPATH'] = os.path.join(gphome, 'lib', 'python')
-        env['PYTHONHOME'] = os.path.join(gphome, 'ext', 'python')
+        env['PYTHONPATH'] = os.path.join(hawq_home, 'lib', 'python')
+        env['PYTHONHOME'] = os.path.join(hawq_home, 'ext', 'python')
         if masterdir:
             env['MASTER_DATA_DIRECTORY'] = masterdir
             env['PGPORT'] = str(self.masterport)

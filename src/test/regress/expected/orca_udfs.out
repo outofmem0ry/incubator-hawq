@@ -2,7 +2,7 @@ drop schema if exists orcaudftest cascade;
 NOTICE:  schema "orcaudftest" does not exist, skipping
 create schema orcaudftest;
 -- start_ignore
-\set Udflib `echo "$GPHOME/lib/libgpoptudf.dylib"`
+\set Udflib `echo "$HAWQ_HOME/lib/libgpoptudf.dylib"`
 -- end_ignore
 create function orcaudftest.EvalExprFromDXLFile(text) returns text as :'Udflib', 'EvalExprFromDXLFile' language c strict;
 create function orcaudftest.OptimizeMinidumpFromFile(text) returns text as :'Udflib', 'OptimizeMinidumpFromFile' language c strict;

@@ -459,7 +459,7 @@ INSERT INTO @gpupgradeschemaname@.pg_attribute_encoding
 -- pg_compression
 
 -- psql expands this for us
-\set pgcompressiondatafile `echo "'$GPHOME/share/postgresql/upgrade/pg_compression.data'"`
+\set pgcompressiondatafile `echo "'$HAWQ_HOME/share/postgresql/upgrade/pg_compression.data'"`
 
 -- Create a special schema for use by the pg_compression_load external table.
 -- We cannot use gpupgradeschemaname (pg_catalog), as that will see the external
@@ -474,7 +474,7 @@ create external web table
 	__@gpupgradeschemaname@_gpmigrator.pg_compression_load(database text,
 											  port text,
 											  status text)
-  execute ' PGOPTIONS=''-c gp_session_role=utility'' psql -q --set ON_ERROR_STOP=ON -p $GP_SEG_PORT --command "copy @gpupgradeschemaname@.pg_compression from ''$GPHOME/share/postgresql/upgrade/pg_compression.data'' with oids csv" $GP_DATABASE $GP_USER && echo "$GP_DATABASE, $GP_SEG_PORT, done";'
+  execute ' PGOPTIONS=''-c gp_session_role=utility'' psql -q --set ON_ERROR_STOP=ON -p $GP_SEG_PORT --command "copy @gpupgradeschemaname@.pg_compression from ''$HAWQ_HOME/share/postgresql/upgrade/pg_compression.data'' with oids csv" $GP_DATABASE $GP_USER && echo "$GP_DATABASE, $GP_SEG_PORT, done";'
   format 'csv';
 
 select * from __@gpupgradeschemaname@_gpmigrator.pg_compression_load;

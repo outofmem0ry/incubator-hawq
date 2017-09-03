@@ -19,7 +19,7 @@
 import os
 import shutil
 
-from gppylib.operations.test.regress.test_package import GppkgTestCase, unittest, run_command, GPHOME
+from gppylib.operations.test.regress.test_package import GppkgTestCase, unittest, run_command, HAWQ_HOME
 
 class MiscTestCase(GppkgTestCase):
     """Covers all test cases which do not fall under any specific category"""
@@ -36,7 +36,7 @@ class MiscTestCase(GppkgTestCase):
         self.extra_clean.add(dummy_file)
 
         self.install(dummy_file)
-        self.assertTrue(os.path.exists(os.path.join(GPHOME, 'share', 'packages', 'archive', dummy_file)))
+        self.assertTrue(os.path.exists(os.path.join(HAWQ_HOME, 'share', 'packages', 'archive', dummy_file)))
 
         self.check_rpm_install(self.A_spec.get_package_name())
 

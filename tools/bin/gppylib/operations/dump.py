@@ -416,7 +416,7 @@ class ValidateGpToolkit(Operation):
             return
         logger.info("gp_toolkit not found. Installing...")
         Psql('Installing gp_toolkit', 
-             filename='$GPHOME/share/postgresql/gp_toolkit.sql',
+             filename='$HAWQ_HOME/share/postgresql/gp_toolkit.sql',
              database=self.database,
              port=self.master_port).run(validateAfter=True)
 
@@ -899,10 +899,10 @@ class MailDumpEvent(Operation):
         self.subject = subject
         self.message = message
     def execute(self):
-        if "HOME" not in os.environ or "GPHOME" not in os.environ:
-            logger.warn("Could not find mail_contacts file. Set $HOME and $GPHOME.")
+        if "HOME" not in os.environ or "HAWQ_HOME" not in os.environ:
+            logger.warn("Could not find mail_contacts file. Set $HOME and $HAWQ_HOME.")
             return
-        mail_file = os.path.join(os.environ["GPHOME"], "bin", "mail_contacts")
+        mail_file = os.path.join(os.environ["HAWQ_HOME"], "bin", "mail_contacts")
         home_mail_file = os.path.join(os.environ["HOME"], "mail_contacts")
         contacts_file = None
         if CheckFile(home_mail_file).run():

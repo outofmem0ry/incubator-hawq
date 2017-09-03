@@ -54,7 +54,7 @@ def pg_config(s):
         f = os.popen("../../../../src/bin/pg_config/pg_config --%s" % s)
     else:
         """If a VPATH build, it might not be there.  Look other places"""
-        """It should be the one in the path, because the makefile includes greenplum_path.sh """
+        """It should be the one in the path, because the makefile includes hawq_env.sh """
         f = os.popen("pg_config --%s" % s)
 
     d = f.readline().strip()

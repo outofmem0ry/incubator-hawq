@@ -142,25 +142,25 @@ def findCmdInPath(cmd):
 
 #############
 def makeCommand(cmd):
-    GPHOME=os.environ.get('GPHOME')
+    HAWQ_HOME=os.environ.get('HAWQ_HOME')
     LIB_PATH=os.environ.get(ENV.LIB_TYPE)
     if not LIB_PATH:
-        LIB_PATH='%s/lib:%s/ext/python/lib:.' % (GPHOME, GPHOME)
+        LIB_PATH='%s/lib:%s/ext/python/lib:.' % (HAWQ_HOME, HAWQ_HOME)
 
     PATH=os.environ.get('PATH')
     if not PATH:
-        PATH='%s/bin:%s/ext/python/bin:.' % (GPHOME, GPHOME)
+        PATH='%s/bin:%s/ext/python/bin:.' % (HAWQ_HOME, HAWQ_HOME)
         
     PYTHONPATH=os.environ.get('PYTHONPATH')
     if not PYTHONPATH:
-        PYTHONPATH="%(gphome)s/lib/python" % {'gphome':GPHOME}
+        PYTHONPATH="%(hawq_home)s/lib/python" % {'hawq_home':HAWQ_HOME}
 
-    return ('GPHOME=%s && export GPHOME '
+    return ('HAWQ_HOME=%s && export HAWQ_HOME '
             '&& PATH=%s && export PATH '
             '&& %s=%s && export %s '
             '&& PYTHONPATH=%s && export PYTHONPATH '
             '&& %s'
-            % (GPHOME, 
+            % (HAWQ_HOME, 
                PATH,
                ENV.LIB_TYPE,
                LIB_PATH,
@@ -253,9 +253,9 @@ def directory_writable(dir, host=None):
             os.remove(file)
         
     else:
-        gphome = os.environ.get('GPHOME')
+        hawq_home = os.environ.get('HAWQ_HOME')
         cmd = makeCommand('''python -c \\"import sys, os; sys.path.extend(['%s', '%s']); import gpmlib; gpmlib.directory_writable('%s')\\"''' %
-                          (os.path.join(gphome, 'bin', 'lib'), os.path.join(gphome, 'lib', 'python'), dir))
+                          (os.path.join(hawq_home, 'bin', 'lib'), os.path.join(hawq_home, 'lib', 'python'), dir))
         (ok, out) = run('''%s "%s"''' % (gplib.ssh_prefix(host=host), cmd))
         if not ok:
             fatal('write file %s error' % file)
@@ -266,7 +266,7 @@ def directory_writable(dir, host=None):
 #############
 class Env:
     def __init__(self):
-        self.GPHOME = None
+        self.HAWQ_HOME = None
         self.USER = None
 
         # mirror type
@@ -405,9 +405,9 @@ class Env:
             fatal('platform not supported')
 
     def chk_environ(self):
-        self.GPHOME=os.getenv('GPHOME')
-        if not self.GPHOME:
-            fatal('GPHOME not found')
+        self.HAWQ_HOME=os.getenv('HAWQ_HOME')
+        if not self.HAWQ_HOME:
+            fatal('HAWQ_HOME not found')
         self.USER =os.getenv('USER') or os.getenv('LOGNAME')
         if not self.USER:
             fatal('USER not found')
@@ -420,8 +420,8 @@ class Env:
         if not PATH:
             PATH='.'
 
-        os.environ[self.LIB_TYPE]='%s/lib:%s/ext/python/lib:%s' % (self.GPHOME, self.GPHOME, LIB_PATH)
-        os.environ['PATH']='%s/bin:%s/ext/python/bin:%s' % (self.GPHOME, self.GPHOME, PATH)
+        os.environ[self.LIB_TYPE]='%s/lib:%s/ext/python/lib:%s' % (self.HAWQ_HOME, self.HAWQ_HOME, LIB_PATH)
+        os.environ['PATH']='%s/bin:%s/ext/python/bin:%s' % (self.HAWQ_HOME, self.HAWQ_HOME, PATH)
         
 
 
@@ -445,7 +445,7 @@ def ping_host(host, fail_exit=False):
     return ok
 
 def chk_postgres_version(host):
-    cmd = makeCommand('%s --gp-version' % os.path.join(os.environ.get('GPHOME'), 'bin/postgres'))
+    cmd = makeCommand('%s --gp-version' % os.path.join(os.environ.get('HAWQ_HOME'), 'bin/postgres'))
     (ok, out) = run(cmd)
     if not ok:
         log_error('Unable to get Greenplum database version')
@@ -688,10 +688,10 @@ def get_ipaddr_to_stdout(host):
 #############
 def edit_file(host, file, search_txt, sub_txt, append=False):
     if host != 'localhost':
-        gphome = os.environ.get('GPHOME')
+        hawq_home = os.environ.get('HAWQ_HOME')
         cmd = makeCommand('''python -c \\"import sys; sys.path.extend(['%s', '%s']); import gpmlib; gpmlib.edit_file('localhost', '%s', '%s', '%s', %s)\\"''' % 
-                          (os.path.join(gphome, 'bin', 'lib'),
-                           os.path.join(gphome, 'lib', 'python'),
+                          (os.path.join(hawq_home, 'bin', 'lib'),
+                           os.path.join(hawq_home, 'lib', 'python'),
                            file,
                            search_txt,
                            sub_txt,
@@ -844,7 +844,7 @@ def sync_segment_datadir(src_host, src_dir, dst_cfg, logfile,
     
     log_info('start segment datadir=%s port=%d on %s' % (dst_cfg['datadir'], dst_cfg['port'], dst_cfg['hostname']))
     cmd = makeCommand('env PGOPTIONS=\\"-c gp_session_role=utility\\" %s -w -D %s -l %s/pg_log/startup.log -o \\"-i -p %d \\" start 2>&1' %
-                      (os.path.join(ENV.GPHOME, 'bin/pg_ctl'), 
+                      (os.path.join(ENV.HAWQ_HOME, 'bin/pg_ctl'), 
                       dst_cfg['datadir'], dst_cfg['datadir'], dst_cfg['port']))    
     (ok, out) = run_warn('%s "%s"' % 
                          (gplib.ssh_prefix(host=dst_cfg['hostname']),
@@ -856,7 +856,7 @@ def sync_segment_datadir(src_host, src_dir, dst_cfg, logfile,
         # stop mirror segment
         log_info('stop segment datadir=%s port=%d on %s' % (dst_cfg['datadir'], dst_cfg['port'], dst_cfg['hostname'])) 
         cmd = makeCommand('env PGOPTIONS=\\"-c gp_session_role=utility\\" %s -w stop -D %s -m smart -l %s.log' % 
-                          (os.path.join(ENV.GPHOME, 'bin/pg_ctl'), 
+                          (os.path.join(ENV.HAWQ_HOME, 'bin/pg_ctl'), 
                            dst_cfg['datadir'], dst_cfg['datadir']))
         (ok, out) = run_warn('%s "%s" >> %s 2>&1' % 
                              (gplib.ssh_prefix(host=dst_cfg['hostname']),

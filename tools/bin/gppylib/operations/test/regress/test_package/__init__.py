@@ -53,10 +53,10 @@ ARCH = platform.machine()
 
 # AK: use dereference_symlink when mucking with RPM database for the same reason 
 # it's used in the gppylib.operations.package. For more info, see the function definition.
-GPHOME = dereference_symlink(gp.get_gphome())
+HAWQ_HOME = dereference_symlink(gp.get_hawq_home())
 
-ARCHIVE_PATH = os.path.join(GPHOME, 'share/packages/archive')
-RPM_DATABASE = os.path.join(GPHOME, 'share/packages/database') 
+ARCHIVE_PATH = os.path.join(HAWQ_HOME, 'share/packages/archive')
+RPM_DATABASE = os.path.join(HAWQ_HOME, 'share/packages/database') 
 GPPKG_EXTENSION = ".gppkg"
 SCRATCH_SPACE = os.path.join(tempfile.gettempdir(), getpass.getuser())
 GPDB_VERSION = '.'.join([str(n) for n in MAIN_VERSION[:2]]) 
@@ -503,7 +503,7 @@ class GppkgTestCase(unittest.TestCase):
         with self.assertRaisesRegexp(ExecutionError, "%s is not installed" % rpm_package_name):
             results = run_remote_command("rpm -q %s --dbpath %s" % (rpm_package_name, RPM_DATABASE), host)
         
-    def install_rpm(self, rpm_filename, rpm_database = RPM_DATABASE, installation_prefix = GPHOME):
+    def install_rpm(self, rpm_filename, rpm_database = RPM_DATABASE, installation_prefix = HAWQ_HOME):
         """
         Installs a given rpm and checks if the installation was successful.
         
@@ -531,7 +531,7 @@ class GppkgTestCase(unittest.TestCase):
         run_command("rpm -e %s --dbpath %s" % (rpm_package_name, rpm_database))
         self.check_rpm_uninstall(rpm_package_name) 
 
-    def install_rpm_remotely(self, rpm_filename, host, rpm_database = RPM_DATABASE, installation_prefix = GPHOME):
+    def install_rpm_remotely(self, rpm_filename, host, rpm_database = RPM_DATABASE, installation_prefix = HAWQ_HOME):
         """
         Installs an rpm on a remote host and checks if the installation was successful
 

@@ -29,16 +29,16 @@ from datetime import datetime
 
 opt = {}
 opt['-p'] = False
-GPHOME=os.getenv('__GPHOME')
-if not GPHOME:
-    GPHOME = os.getenv('GPHOME')
+HAWQ_HOME=os.getenv('__HAWQ_HOME')
+if not HAWQ_HOME:
+    HAWQ_HOME = os.getenv('HAWQ_HOME')
 
 def makeCommand(cmd):
-    return ('__GPHOME=%s && GPHOME=$__GPHOME && export GPHOME '
-            '&& PATH=$GPHOME/bin:$PATH && export PATH '
-            '&& LD_LIBRARY_PATH=$GPHOME/lib:$LD_LIBRARY_PATH && export LD_LIBRARY_PATH '
+    return ('__HAWQ_HOME=%s && HAWQ_HOME=$__HAWQ_HOME && export HAWQ_HOME '
+            '&& PATH=$HAWQ_HOME/bin:$PATH && export PATH '
+            '&& LD_LIBRARY_PATH=$HAWQ_HOME/lib:$LD_LIBRARY_PATH && export LD_LIBRARY_PATH '
             '&& %s'
-            % (GPHOME, cmd))
+            % (HAWQ_HOME, cmd))
 
 ################
 def usage(exitarg):
@@ -93,19 +93,19 @@ def add(res, prefix, lines):
 
 
 def do_gppath(res):
-    out = os.getenv("GPHOME")
+    out = os.getenv("HAWQ_HOME")
     if out is None:
 	out = ''
-    res['env.GPHOME'] = out.strip()
-    out = os.getenv('__GPHOME')
+    res['env.HAWQ_HOME'] = out.strip()
+    out = os.getenv('__HAWQ_HOME')
     if out is None:
         out = ''
-    res['env.__GPHOME'] = out.strip()
+    res['env.__HAWQ_HOME'] = out.strip()
     return True
 
 
 def do_postgres_md5(res):
-    cmd = makeCommand("cat $__GPHOME/bin/postgres | "
+    cmd = makeCommand("cat $__HAWQ_HOME/bin/postgres | "
                       "python -c 'import md5, sys; m = md5.new(); m.update(sys.stdin.read()); print m.hexdigest()'")
     (ok, out) = run(cmd)
     if ok:
@@ -117,7 +117,7 @@ def do_postgres_md5(res):
 
 
 def do_postgres_version(res):
-    cmd = makeCommand("$__GPHOME/bin/postgres --version")
+    cmd = makeCommand("$__HAWQ_HOME/bin/postgres --version")
     (ok, out) = run(cmd)
     if ok and len(out) == 1: 
         res['postgres.version'] = out[0].strip()

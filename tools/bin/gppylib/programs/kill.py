@@ -95,13 +95,13 @@ class KillProgram:
     
         command = self.examine_process(pid)
 
-        critical_process_prefix = ['postgres', gp.get_gphome(), dereference_symlink(gp.get_gphome())]
+        critical_process_prefix = ['postgres', gp.get_hawq_home(), dereference_symlink(gp.get_hawq_home())]
 
         for prefix in critical_process_prefix:
             if command.startswith(prefix):
                 raise KillError('process %s may not be killed' % pid)
 
-        if not command.startswith('python ' + gp.get_gphome()):
+        if not command.startswith('python ' + gp.get_hawq_home()):
             raise KillError('process %s ignored by gpkill as it is not a greenplum process' % pid)
 
     def examine_process(self, pid):

@@ -23,10 +23,10 @@ ifneq "$(HD)" ""
 else
     ifneq "$(PXF_HOME)" ""
         BUILD_PARAMS= -DdeployPath=$(PXF_HOME)
-    else ifneq "$(GPHOME)" ""
-        BUILD_PARAMS= -DdeployPath="$(GPHOME)/pxf"
+    else ifneq "$(HAWQ_HOME)" ""
+        BUILD_PARAMS= -DdeployPath="$(HAWQ_HOME)/pxf"
     else
-		@echo "Cannot invoke install without configuring either PXF_HOME or GPHOME"
+		@echo "Cannot invoke install without configuring either PXF_HOME or HAWQ_HOME"
     endif
 endif
 

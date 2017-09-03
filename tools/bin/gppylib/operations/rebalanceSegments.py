@@ -59,7 +59,7 @@ class GpSegmentRebalanceOperation:
             logger.info("Stopping unbalanced primary segments...")
             for hostname in unbalanced_primary_segs.keys():
                 cmd = GpSegStopCmd("stop unbalanced primary segs",
-                                   self.gpEnv.getGpHome(),
+                                   self.gpEnv.getHawqHome(),
                                    self.gpEnv.getGpVersion(),
                                    'fast',
                                    unbalanced_primary_segs[hostname],

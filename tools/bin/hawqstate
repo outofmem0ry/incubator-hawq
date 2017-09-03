@@ -176,13 +176,13 @@ if __name__ == '__main__':
 
     logger, log_filename = setup_hawq_tool_logging('hawq_state',getLocalHostname(),getUserName(), options.logDir) 
 
-    GPHOME = os.getenv('GPHOME')
-    if not GPHOME:
-        sys.exit("GPHOME environment variable not set, exit")
+    HAWQ_HOME = os.getenv('HAWQ_HOME')
+    if not HAWQ_HOME:
+        sys.exit("HAWQ_HOME environment variable not set, exit")
 
-    hawq_site = HawqXMLParser(GPHOME)
+    hawq_site = HawqXMLParser(HAWQ_HOME)
     hawq_site.get_all_values()
-    segment_list = parse_hosts_file(GPHOME)
+    segment_list = parse_hosts_file(HAWQ_HOME)
     master_host = hawq_site.hawq_dict['hawq_master_address_host']
     host_list = segment_list + [master_host]
     if 'hawq_standby_address_host' in hawq_site.hawq_dict:

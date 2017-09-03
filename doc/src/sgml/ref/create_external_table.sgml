@@ -162,7 +162,7 @@ CREATE WRITABLE EXTERNAL WEB TABLE table_name
 	serves external data files to all Greenplum Database segments in parallel. 
 	All primary segments access the external file(s) in parallel regardless of how 
 	many URIs you specify when defining the external table. <literal>gpfdist</literal> 
-	is located in <literal>$GPHOME/bin<literal> on your Greenplum Database master host. 
+	is located in <literal>$HAWQ_HOME/bin<literal> on your Greenplum Database master host. 
   </para>
   
   <para>

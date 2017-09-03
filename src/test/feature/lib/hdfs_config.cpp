@@ -112,7 +112,7 @@ bool HdfsConfig::LoadFromHawqConfigFile() {
   if (isLoadFromHawqConfigFile) {
     return true;
   }
-  const char *env = getenv("GPHOME");
+  const char *env = getenv("HAWQ_HOME");
   string confPath = env ? env : "";
   if (confPath != "") {
     confPath.append("/etc/hdfs-client.xml");

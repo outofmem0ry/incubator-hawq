@@ -18,13 +18,13 @@ mkdir -p %{buildroot}/temp
 make -C %{pljava_dir} install prefix=%{buildroot}/temp
 
 %post
-echo "export PATH=\$JAVA_HOME/bin:\$PATH" >> $GPHOME/greenplum_path.sh
-echo "export LD_LIBRARY_PATH=\$JAVA_HOME/jre/lib/amd64/server/:\$LD_LIBRARY_PATH" >> $GPHOME/greenplum_path.sh
+echo "export PATH=\$JAVA_HOME/bin:\$PATH" >> $HAWQ_HOME/hawq_env.sh
+echo "export LD_LIBRARY_PATH=\$JAVA_HOME/jre/lib/amd64/server/:\$LD_LIBRARY_PATH" >> $HAWQ_HOME/hawq_env.sh
 
 %postun
-sed -i".bk" "s|export PATH=\$JAVA_HOME/bin:\$PATH||g" $GPHOME/greenplum_path.sh
-sed -i".bk" "s|export LD_LIBRARY_PATH=\$JAVA_HOME/jre/lib/amd64/server:\$LD_LIBRARY_PATH||g" $GPHOME/greenplum_path.sh
-rm -rf $GPHOME/greenplum_path.sh.bk
+sed -i".bk" "s|export PATH=\$JAVA_HOME/bin:\$PATH||g" $HAWQ_HOME/hawq_env.sh
+sed -i".bk" "s|export LD_LIBRARY_PATH=\$JAVA_HOME/jre/lib/amd64/server:\$LD_LIBRARY_PATH||g" $HAWQ_HOME/hawq_env.sh
+rm -rf $HAWQ_HOME/hawq_env.sh.bk
 
 %files
 /temp

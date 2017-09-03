@@ -241,7 +241,7 @@ int testHdfsConnect(hdfsFS * fsptr, const char * host, int iPort,
             else
                 fprintf(stderr, "ERROR: (HA) Can not connect to 'hdfs://%s'\n", host);
 
-            fprintf(stderr, "Please check your HDFS or hdfs-client.xml in ${GPHOME}/etc\n");
+            fprintf(stderr, "Please check your HDFS or hdfs-client.xml in ${HAWQ_HOME}/etc\n");
             return CONNECT_ERR;
         }
 

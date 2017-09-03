@@ -185,11 +185,11 @@ TEST_F(TestUDF, TestUDFPgcrypto)
 	// enable pgcrypto package if it is absent
 	if (util.getQueryResult("SELECT proname FROM pg_proc WHERE proname = 'crypt'") != "crypt")
 	{
-		const char *gph = getenv("GPHOME");
-		std::string gphome = gph ? gph : "";
-		EXPECT_NE(gphome, "");
+		const char *gph = getenv("HAWQ_HOME");
+		std::string hawq_home = gph ? gph : "";
+		EXPECT_NE(hawq_home, "");
 
-		util.execSQLFile(gphome + "/share/postgresql/contrib/pgcrypto.sql");
+		util.execSQLFile(hawq_home + "/share/postgresql/contrib/pgcrypto.sql");
 	}
 
 	// run test if pgcrypto package is enabled
@@ -222,14 +222,14 @@ TEST_F(TestUDF, TestUDFPljava)
 	hawq::test::SQLUtility util;
 	std::string d_feature_test_root(util.getTestRootPath());
 
-	const char *gph = getenv("GPHOME");
-	std::string gphome = gph ? gph : "";
-	EXPECT_NE(gphome, "");
+	const char *gph = getenv("HAWQ_HOME");
+	std::string hawq_home = gph ? gph : "";
+	EXPECT_NE(hawq_home, "");
 
 	// enable pljava language if it is absent
 	if (util.getQueryResult("SELECT lanname FROM pg_language WHERE lanname = 'java'") != "java")
 	{
-		hawq::test::Command cmd("psql -f " + gphome + "/share/postgresql/pljava/install.sql");
+		hawq::test::Command cmd("psql -f " + hawq_home + "/share/postgresql/pljava/install.sql");
 		cmd.run();
 	}
 
@@ -244,7 +244,7 @@ TEST_F(TestUDF, TestUDFPljava)
 		std::string query = "SELECT string_agg('-h ' || hostname, ' ' ORDER BY hostname) FROM gp_segment_configuration;";
 		std::string hosts = util.getQueryResult(query);
 		hawq::test::HAWQScp hscp;
-		EXPECT_EQ(hscp.copy(hosts, d_feature_test_root + "/UDF/sql/PLJavaAdd.jar", gphome + "/lib/postgresql/java/"), true);
+		EXPECT_EQ(hscp.copy(hosts, d_feature_test_root + "/UDF/sql/PLJavaAdd.jar", hawq_home + "/lib/postgresql/java/"), true);
 
 		util.execSQLFile("UDF/sql/function_pljava.sql",
 		                 "UDF/ans/function_pljava.ans");
@@ -256,14 +256,14 @@ TEST_F(TestUDF, TestUDFPljavau)
 	hawq::test::SQLUtility util;
 	std::string d_feature_test_root(util.getTestRootPath());
 
-	const char *gph = getenv("GPHOME");
-	std::string gphome = gph ? gph : "";
-	EXPECT_NE(gphome, "");
+	const char *gph = getenv("HAWQ_HOME");
+	std::string hawq_home = gph ? gph : "";
+	EXPECT_NE(hawq_home, "");
 
 	// enable pljavau language if it is absent
 	if (util.getQueryResult("SELECT lanname FROM pg_language WHERE lanname = 'javau'") != "javau")
 	{
-		hawq::test::Command cmd("psql -f " + gphome + "/share/postgresql/pljava/install.sql");
+		hawq::test::Command cmd("psql -f " + hawq_home + "/share/postgresql/pljava/install.sql");
 		cmd.run();
 	}
 
@@ -278,7 +278,7 @@ TEST_F(TestUDF, TestUDFPljavau)
 		std::string query = "SELECT string_agg('-h ' || hostname, ' ' ORDER BY hostname) FROM gp_segment_configuration;";
 		std::string hosts = util.getQueryResult(query);
 		hawq::test::HAWQScp hscp;
-		EXPECT_EQ(hscp.copy(hosts, d_feature_test_root + "/UDF/sql/PLJavauAdd.jar", gphome + "/lib/postgresql/java/"), true);
+		EXPECT_EQ(hscp.copy(hosts, d_feature_test_root + "/UDF/sql/PLJavauAdd.jar", hawq_home + "/lib/postgresql/java/"), true);
 
 		util.execSQLFile("UDF/sql/function_pljavau.sql",
 		                 "UDF/ans/function_pljavau.ans");

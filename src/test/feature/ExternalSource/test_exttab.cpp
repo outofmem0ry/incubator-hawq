@@ -38,7 +38,7 @@ TEST_F(TestExternalTable, DISABLED_TestExternalTableAll) {
     std::unordered_map<std::string, std::string> D;
     D["@hostname@"] = std::string("localhost");
     D["@abs_srcdir@"] = test_root + "/ExternalSource";
-    D["@gpwhich_gpfdist@"] = std::string(std::string(getenv("GPHOME")) + "/bin/gpfdist");
+    D["@gpwhich_gpfdist@"] = std::string(std::string(getenv("HAWQ_HOME")) + "/bin/gpfdist");
     frep.replace(test_root + "/ExternalSource/sql/exttab1.sql.source",
                  test_root + "/ExternalSource/sql/exttab1.sql",
                  D);

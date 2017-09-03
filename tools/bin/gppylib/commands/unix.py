@@ -46,7 +46,7 @@ platform_list = [SUNOS,LINUX,DARWIN,FREEBSD]
 
 curr_platform = platform.uname()[0].lower()
 
-GPHOME=os.environ.get('GPHOME', None)
+HAWQ_HOME=os.environ.get('HAWQ_HOME', None)
 
 
 #---------------command path--------------------
@@ -54,8 +54,8 @@ GPHOME=os.environ.get('GPHOME', None)
 CMDPATH = ['/usr/kerberos/bin', '/usr/sfw/bin', '/opt/sfw/bin', '/bin', '/usr/local/bin', 
                '/usr/bin', '/sbin', '/usr/sbin', '/usr/ucb', '/sw/bin', '/opt/Navisphere/bin']
 
-if GPHOME:
-    CMDPATH.append(GPHOME)
+if HAWQ_HOME:
+    CMDPATH.append(HAWQ_HOME)
 
 CMD_CACHE = {}
 

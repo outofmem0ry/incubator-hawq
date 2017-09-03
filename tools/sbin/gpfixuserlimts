@@ -27,7 +27,7 @@ try:
     from optparse import Option, OptionParser 
     from gppylib.gpparseopts import OptParser, OptChecker
 except ImportError, e:    
-    sys.exit('Cannot import modules.  Please check that you have sourced greenplum_path.sh.  Detail: ' + str(e))
+    sys.exit('Cannot import modules.  Please check that you have sourced hawq_env.sh.  Detail: ' + str(e))
 
 options = None
 tmpfile = None
@@ -47,10 +47,10 @@ def parseargs():
     parser.add_option('-u', '--user', type='string')
     (options, args) = parser.parse_args()
 
-    global gphome
-    gphome = os.environ.get('GPHOME')
-    if not gphome:
-        sys.stderr.write("GPHOME not set")
+    global hawq_home
+    hawq_home = os.environ.get('HAWQ_HOME')
+    if not hawq_home:
+        sys.stderr.write("HAWQ_HOME not set")
         return True
 
     if options.help:

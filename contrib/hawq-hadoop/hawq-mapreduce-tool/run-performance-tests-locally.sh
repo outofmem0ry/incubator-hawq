@@ -20,7 +20,7 @@
 ##-----------------------------------------------------------------------
 ##                        NOTICE!!
 ## Before using this script to run performance tests, you should
-## 0. source greenplum_path.sh
+## 0. source hawq_env.sh
 ## 1. start HDFS and HAWQ, and create a "gptest" database
 ## 2. if you HAWQ are not running at localhost:5432, specify PG_BASE_ADDRESS and PG_BASE_PORT
 ## 3. make sure HADOOP_HOME points to right place and hadoop commands have been added to PATH

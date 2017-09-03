@@ -36,7 +36,7 @@ $$ language 'plpgsql';
 -------------------------------------
 -- Execute the main upgrade script
 -------------------------------------
-\set upg2script `echo $GPHOME/share/postgresql/upgrade/upg2_catupgrade_20.sql`
+\set upg2script `echo $HAWQ_HOME/share/postgresql/upgrade/upg2_catupgrade_20.sql`
 \i :upg2script
 
 

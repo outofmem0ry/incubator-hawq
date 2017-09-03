@@ -40,7 +40,7 @@ on hosts without running validation checks.
 
 When running checks, hawq check compares your actual configuration
 setting with an expected value listed in a configuration file 
-($GPHOME/etc/hawq_check.cnf by default). You must modify your
+($HAWQ_HOME/etc/hawq_check.cnf by default). You must modify your
 configuration values for "mount.points" and "diskusage.monitor.mounts"
 to the actual mount points you want to check, as a comma-separated
 list. Otherwise the utility only checks the root directory, which
@@ -61,7 +61,7 @@ OPTIONS
 --config <config_file>
 
  The name of a configuration file to use instead of the default 
- file $GPHOME/etc/hawq_check.cnf.
+ file $HAWQ_HOME/etc/hawq_check.cnf.
 
 -f <hostfile_hawq_check>
 

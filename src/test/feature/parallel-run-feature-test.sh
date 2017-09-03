@@ -18,12 +18,12 @@
 # under the License.
 #
 
-if [ x$GPHOME == 'x' ]; then
-  echo "Please source greenplum_path.sh before running feature tests."
+if [ x$HAWQ_HOME == 'x' ]; then
+  echo "Please source hawq_env.sh before running feature tests."
   exit 0
 fi
 
-PSQL=${GPHOME}/bin/psql
+PSQL=${HAWQ_HOME}/bin/psql
 HAWQ_DB=${PGDATABASE:-"postgres"}
 HAWQ_HOST=${PGHOST:-"localhost"}
 HAWQ_PORT=${PGPORT:-"5432"}

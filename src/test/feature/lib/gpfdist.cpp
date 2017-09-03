@@ -29,8 +29,8 @@ void GPfdist::init_gpfdist() {
 					"execute E'( python %s/bin/lib/gppinggpfdist.py localhost:7070 2>&1 || echo) ' "
 					"on SEGMENT 0 "
 					"FORMAT 'text' (delimiter '|');";
-	auto GPHOME = getenv("GPHOME");
-	util->execute(hawq::test::stringFormat(sql, GPHOME));
+	auto HAWQ_HOME = getenv("HAWQ_HOME");
+	util->execute(hawq::test::stringFormat(sql, HAWQ_HOME));
 
 	sql =
 			"CREATE EXTERNAL WEB TABLE gpfdist_start (x text) "
@@ -38,7 +38,7 @@ void GPfdist::init_gpfdist() {
 					"on SEGMENT 0 "
 					"FORMAT 'text' (delimiter '|');";
 	std::string path = util->getTestRootPath() + "/ExternalSource/data";
-	util->execute(hawq::test::stringFormat(sql, GPHOME, path.c_str()));
+	util->execute(hawq::test::stringFormat(sql, HAWQ_HOME, path.c_str()));
 
 	util->execute(
 			"CREATE EXTERNAL WEB TABLE gpfdist_stop (x text) "

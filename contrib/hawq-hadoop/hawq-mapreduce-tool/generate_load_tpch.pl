@@ -18,7 +18,7 @@
 
 ####################################################
 #Author  : Bharath
-#Comment : Takes the scale factor, number of primary segments, master port number and database name as input and load the tpch data in parallel by streaming the output of dbgen using external tables. Expects the dbgen program and dists.dss file to be present in the $GPHOME/bin directory on all the segment hosts.
+#Comment : Takes the scale factor, number of primary segments, master port number and database name as input and load the tpch data in parallel by streaming the output of dbgen using external tables. Expects the dbgen program and dists.dss file to be present in the $HAWQ_HOME/bin directory on all the segment hosts.
 #Usage   : sample usage > perl load_tpch.pl -scale <size of data to be loaded. scale of 1 means 1GB, 1000 means 1TB> -num <total number of primary segments in the cluster> -port <master port number> -db <name of the database in which the tpch tables will be created>
 ###################################################
 
@@ -49,7 +49,7 @@ chomp($ddl_dml_file);
 unless (defined($scale) && defined($num_primary_segs) && defined($port) && defined($dbname) && defined($haspartition) && defined($dbversion) && defined($compress_flag) && defined($orientation))
 {
     print "\nUsage: $0 -scale <size of data to be loaded. scale of 1 means 1GB, 1000 means 1TB> -num <total number of primary segments in the cluster> -port <master port number> -db <name of the database in which the tpch tables will be created> -table <table type, support ao/heap. if table type is set ao> -orient <row-based or column-based. row means row-based and column means column-based> -partition <true or false> -dbverions <gpdb or hawq> -compress <false or true. If true, need to provide -type and -level>-type <compression type of append-only tables. Support zlib and QuickLZ)> -level <compression level for each compression type. QuickLZ compression level can only be set to level 1; no other options are available. Compression level with zlib can be set at any value from 1 - 9>\n\n";
-    print "The program expects database <dbname> to be present. Also, it expects dbgen program and dists.dss file to be present in GPHOME/bin directory. \n\n";
+    print "The program expects database <dbname> to be present. Also, it expects dbgen program and dists.dss file to be present in HAWQ_HOME/bin directory. \n\n";
     exit;
 }
 
@@ -483,12 +483,12 @@ print OUT "create external web table $e_nation (N_NATIONKEY  INTEGER ,
                             N_NAME       CHAR(25) ,
                             N_REGIONKEY  INTEGER ,
                             N_COMMENT    VARCHAR(152)) 
-                        execute 'bash -c \"\$GPHOME/bin/dbgen -b \$GPHOME/bin/dists.dss -T n -s $scale\"' on 1 format 'text' (delimiter '|');\n";
+                        execute 'bash -c \"\$HAWQ_HOME/bin/dbgen -b \$HAWQ_HOME/bin/dists.dss -T n -s $scale\"' on 1 format 'text' (delimiter '|');\n";
 
 print OUT "CREATE external web TABLE $e_region  ( R_REGIONKEY  INTEGER ,
                             R_NAME       CHAR(25) ,
                             R_COMMENT    VARCHAR(152)) 
-                        execute 'bash -c \"\$GPHOME/bin/dbgen -b \$GPHOME/bin/dists.dss -T r -s $scale\"'
+                        execute 'bash -c \"\$HAWQ_HOME/bin/dbgen -b \$HAWQ_HOME/bin/dists.dss -T r -s $scale\"'
                         on 1 format 'text' (delimiter '|');\n";
 
 print OUT "CREATE external web TABLE $e_part  ( P_PARTKEY     INTEGER ,
@@ -500,7 +500,7 @@ print OUT "CREATE external web TABLE $e_part  ( P_PARTKEY     INTEGER ,
                           P_CONTAINER   CHAR(10) ,
                           P_RETAILPRICE DECIMAL(15,2) ,
                           P_COMMENT     VARCHAR(23) ) 
-                        execute 'bash -c \"\$GPHOME/bin/dbgen -b \$GPHOME/bin/dists.dss -T P -s $scale -N $num_primary_segs -n \$((GP_SEGMENT_ID + 1))\"'
+                        execute 'bash -c \"\$HAWQ_HOME/bin/dbgen -b \$HAWQ_HOME/bin/dists.dss -T P -s $scale -N $num_primary_segs -n \$((GP_SEGMENT_ID + 1))\"'
                         on $num_primary_segs format 'text' (delimiter '|');\n";
 
 print OUT "CREATE external web TABLE $e_supplier ( S_SUPPKEY     INTEGER ,
@@ -510,7 +510,7 @@ print OUT "CREATE external web TABLE $e_supplier ( S_SUPPKEY     INTEGER ,
                              S_PHONE       CHAR(15) ,
                              S_ACCTBAL     DECIMAL(15,2) ,
                              S_COMMENT     VARCHAR(101) ) 
-                        execute 'bash -c \"\$GPHOME/bin/dbgen -b \$GPHOME/bin/dists.dss -T s -s $scale -N $num_primary_segs -n \$((GP_SEGMENT_ID + 1))\"'
+                        execute 'bash -c \"\$HAWQ_HOME/bin/dbgen -b \$HAWQ_HOME/bin/dists.dss -T s -s $scale -N $num_primary_segs -n \$((GP_SEGMENT_ID + 1))\"'
                         on $num_primary_segs format 'text' (delimiter '|');\n";
 
 print OUT "CREATE external web TABLE $e_partsupp ( PS_PARTKEY     INTEGER ,
@@ -518,7 +518,7 @@ print OUT "CREATE external web TABLE $e_partsupp ( PS_PARTKEY     INTEGER ,
                              PS_AVAILQTY    INTEGER ,
                              PS_SUPPLYCOST  DECIMAL(15,2)  ,
                              PS_COMMENT     VARCHAR(199) ) 
-                        execute 'bash -c \"\$GPHOME/bin/dbgen -b \$GPHOME/bin/dists.dss -T S -s $scale -N $num_primary_segs -n \$((GP_SEGMENT_ID + 1))\"'
+                        execute 'bash -c \"\$HAWQ_HOME/bin/dbgen -b \$HAWQ_HOME/bin/dists.dss -T S -s $scale -N $num_primary_segs -n \$((GP_SEGMENT_ID + 1))\"'
                         on $num_primary_segs format 'text' (delimiter '|');\n";
 
 print OUT "CREATE external web TABLE $e_customer ( C_CUSTKEY     INTEGER ,
@@ -529,7 +529,7 @@ print OUT "CREATE external web TABLE $e_customer ( C_CUSTKEY     INTEGER ,
                              C_ACCTBAL     DECIMAL(15,2) ,
                              C_MKTSEGMENT  CHAR(10) ,
                              C_COMMENT     VARCHAR(117) ) 
-                        execute 'bash -c \"\$GPHOME/bin/dbgen -b \$GPHOME/bin/dists.dss -T c -s $scale -N $num_primary_segs -n \$((GP_SEGMENT_ID + 1))\"'
+                        execute 'bash -c \"\$HAWQ_HOME/bin/dbgen -b \$HAWQ_HOME/bin/dists.dss -T c -s $scale -N $num_primary_segs -n \$((GP_SEGMENT_ID + 1))\"'
                         on $num_primary_segs format 'text' (delimiter '|');\n";
 
 print OUT "CREATE external web TABLE $e_orders  ( O_ORDERKEY       INT8 ,
@@ -541,7 +541,7 @@ print OUT "CREATE external web TABLE $e_orders  ( O_ORDERKEY       INT8 ,
                            O_CLERK          CHAR(15) ,
                            O_SHIPPRIORITY   INTEGER ,
                            O_COMMENT        VARCHAR(79) ) 
-                        execute 'bash -c \"\$GPHOME/bin/dbgen -b \$GPHOME/bin/dists.dss -T O -s $scale -N $num_primary_segs -n \$((GP_SEGMENT_ID + 1))\"'
+                        execute 'bash -c \"\$HAWQ_HOME/bin/dbgen -b \$HAWQ_HOME/bin/dists.dss -T O -s $scale -N $num_primary_segs -n \$((GP_SEGMENT_ID + 1))\"'
                         on $num_primary_segs format 'text' (delimiter '|');\n";
 
 print OUT "CREATE EXTERNAL WEB TABLE $e_lineitem ( L_ORDERKEY    INT8 ,
@@ -560,7 +560,7 @@ print OUT "CREATE EXTERNAL WEB TABLE $e_lineitem ( L_ORDERKEY    INT8 ,
                               L_SHIPINSTRUCT CHAR(25) ,
                               L_SHIPMODE     CHAR(10) ,
                               L_COMMENT      VARCHAR(44) )
-                              EXECUTE 'bash -c \"\$GPHOME/bin/dbgen -b \$GPHOME/bin/dists.dss -T L -s $scale -N $num_primary_segs -n \$((GP_SEGMENT_ID + 1))\"' 
+                              EXECUTE 'bash -c \"\$HAWQ_HOME/bin/dbgen -b \$HAWQ_HOME/bin/dists.dss -T L -s $scale -N $num_primary_segs -n \$((GP_SEGMENT_ID + 1))\"' 
                               on $num_primary_segs format 'text' (delimiter '|');\n\n";
 
 # Now statements to load the data

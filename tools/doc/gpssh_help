@@ -137,5 +137,5 @@ Execute single commands in non-interactive mode on hosts sdw2
 and localhost:
 
   $ hawq ssh -h sdw2 -h localhost -v -e 'ls -a /data/primary/*'
-  $ hawq ssh -h sdw2 -h localhost -v -e 'echo $GPHOME'
+  $ hawq ssh -h sdw2 -h localhost -v -e 'echo $HAWQ_HOME'
   $ hawq ssh -h sdw2 -h localhost -v -e 'ls -1 | wc -l'

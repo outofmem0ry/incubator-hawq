@@ -36,8 +36,8 @@ if [ "$BLD_ARCH" == "" ]; then
     fi
 fi
 
-if [ ! -d $GPHOME ]; then
-    echo "GPHOME is either not set or is not a directory."
+if [ ! -d $HAWQ_HOME ]; then
+    echo "HAWQ_HOME is either not set or is not a directory."
     exit 1
 fi
 
@@ -58,7 +58,7 @@ if [ ! -d $jvmsodir ]; then
     exit 1
 fi
 
-pljsql="$GPHOME/share/postgresql/pljava/install.sql"
+pljsql="$HAWQ_HOME/share/postgresql/pljava/install.sql"
 if [ ! -f $pljsql ]; then
     echo "Cannot find $pljsql."
     exit 1
@@ -99,11 +99,11 @@ if [ ! -f $hosts ]; then
     exit 1
 fi
 
-# Validate GPHOME exists on all segments.
-cmd="gpssh -f $hosts test -d $GPHOME"
+# Validate HAWQ_HOME exists on all segments.
+cmd="gpssh -f $hosts test -d $HAWQ_HOME"
 output=$($cmd)
 if [ 0 -ne $? ]; then
-    echo "Directory $GPHOME not found on one or more segments."
+    echo "Directory $HAWQ_HOME not found on one or more segments."
     exit 1
 fi
 if [[ $output == *ERROR* ]]; then
@@ -113,7 +113,7 @@ if [[ $output == *ERROR* ]]; then
     exit 1
 fi
 
-# Copy modified greenplum_path.sh on segments.
+# Copy modified hawq_env.sh on segments.
 function install_pljava_segments() {
     # Ensure that JAVA_HOME is the same on segments.
     cmd="gpssh -f $hosts -e test -x $jvmso"
@@ -127,10 +127,10 @@ function install_pljava_segments() {
 	echo "Command: $cmd"
 	exit 1
     fi
-    cmd="gpscp -f $hosts $GPHOME/greenplum_path.sh =:$GPHOME"
+    cmd="gpscp -f $hosts $HAWQ_HOME/hawq_env.sh =:$HAWQ_HOME"
     output=$($cmd)
     if [ 0 -ne $? ]; then
-	echo "Failed to copy greenplum_path.sh to one or more segments."
+	echo "Failed to copy hawq_env.sh to one or more segments."
 	exit 1
     fi
     if [[ $output == *ERROR* ]]; then
@@ -147,36 +147,36 @@ if [ $expand_mode -eq 1 ]; then
     exit 0
 fi
 
-# Patch greenplum_path.sh to include JNI library in
+# Patch hawq_env.sh to include JNI library in
 # (DY)LD_LIBRARY_PATH.  Remove existing JAVA_HOME related lines, if
 # any, so that we don't end up appending the same lines again.
-grep -v "$jvmsodir" $GPHOME/greenplum_path.sh > ./greenplum_path.sh.tmp
-if [ ! -f ./greenplum_path.sh.tmp ]; then
-    echo "Failed to patch $GPHOME/greenplum_path.sh."
+grep -v "$jvmsodir" $HAWQ_HOME/hawq_env.sh > ./hawq_env.sh.tmp
+if [ ! -f ./hawq_env.sh.tmp ]; then
+    echo "Failed to patch $HAWQ_HOME/hawq_env.sh."
     echo "Command: $cmd"
     echo "Output: $output"
     exit 1
 fi
 
 if [ $BLD_ARCH == "rhel5_x86_64" ]; then
-    echo "export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:$jvmsodir" >> ./greenplum_path.sh.tmp
+    echo "export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:$jvmsodir" >> ./hawq_env.sh.tmp
 else
-    echo "export DYLD_LIBRARY_PATH=\$DYLD_LIBRARY_PATH:$jvmsodir" >> ./greenplum_path.sh.tmp
+    echo "export DYLD_LIBRARY_PATH=\$DYLD_LIBRARY_PATH:$jvmsodir" >> ./hawq_env.sh.tmp
 fi
 
-cmd="mv ./greenplum_path.sh.tmp $GPHOME/greenplum_path.sh"
+cmd="mv ./hawq_env.sh.tmp $HAWQ_HOME/hawq_env.sh"
 output=$($cmd)
 if [ 0 -ne $? ]; then
-    echo "Failed to patch $GPHOME/greenplum_path.sh."
+    echo "Failed to patch $HAWQ_HOME/hawq_env.sh."
     echo "Command: $cmd"
     echo "Output: $output"
     exit 1
 fi
 
-# Verify if we patched greenplum_path.sh correctly.
-output=$(grep "LD_LIBRARY_PATH.*$jvmsodir" $GPHOME/greenplum_path.sh)
+# Verify if we patched hawq_env.sh correctly.
+output=$(grep "LD_LIBRARY_PATH.*$jvmsodir" $HAWQ_HOME/hawq_env.sh)
 if [ 0 -ne $? ]; then
-    echo "Failed to patch $GPHOME/greenplum_path.sh"
+    echo "Failed to patch $HAWQ_HOME/hawq_env.sh"
     exit 1
 fi
 
@@ -193,6 +193,6 @@ fi
 
 echo "pljava installation was successful."
 echo "The following steps are needed before pljava language may be used:"
-echo "(1) source \$GPHOME/greenplum_path.sh."
+echo "(1) source \$HAWQ_HOME/hawq_env.sh."
 echo "(2) Restart HAWQ using 'gpstop -ar'."
 echo "(3) Create pljava language by executing 'CREATE LANGUAGE pljava;' from psql."

@@ -41,7 +41,7 @@ try:
     from pygresql.pg import DatabaseError
 except ImportError, e:
     sys.exit('ERROR: Cannot import modules.  Please check that you '
-             'have sourced greenplum_path.sh.  Detail: ' + str(e))
+             'have sourced hawq_env.sh.  Detail: ' + str(e))
 
 
 class HawqInit:
@@ -49,7 +49,7 @@ class HawqInit:
         self.node_type = opts.node_type
         self.hawq_command = opts.hawq_command
         self.user= opts.user
-        self.GPHOME = opts.GPHOME
+        self.HAWQ_HOME = opts.HAWQ_HOME
         self.stop_mode = opts.stop_mode
         self.log_dir = opts.log_dir
         self.timeout = opts.timeout_seconds
@@ -97,7 +97,7 @@ class HawqInit:
         self.hawq_master_temp_directory = self.hawq_dict['hawq_master_temp_directory']
         self.hawq_segment_temp_directory = self.hawq_dict['hawq_segment_temp_directory']
         self.dfs_url = self.hawq_dict['hawq_dfs_url']
-        self.host_list = parse_hosts_file(self.GPHOME)
+        self.host_list = parse_hosts_file(self.HAWQ_HOME)
         self.hosts_count_number = len(self.host_list)
 
         if 'hawq_standby_address_host' in self.hawq_dict:
@@ -135,10 +135,10 @@ class HawqInit:
             self.krb_srvname = 'postgres'
     
     def _write_config(self):
-        configFile = "%s/etc/_mgmt_config" % self.GPHOME
+        configFile = "%s/etc/_mgmt_config" % self.HAWQ_HOME
         # Clean configFile while the first write in.
         with open(configFile, 'w') as f: 
-            f.write("GPHOME=%s\n" % self.GPHOME)
+            f.write("HAWQ_HOME=%s\n" % self.HAWQ_HOME)
         with open(configFile, 'a') as f: 
             f.write("hawqUser=%s\n" % self.user)
             f.write("master_host_name=%s\n" % self.master_host_name)
@@ -164,20 +164,20 @@ class HawqInit:
                 f.write("standby_host_name=%s\n" % self.standby_host_name)
 
     def _get_ips(self):
-        cmd = "%s/bin/lib/get_ip_addresses_of_host.sh %s master_ip_address_all" % (self.GPHOME, self.master_host_name)
+        cmd = "%s/bin/lib/get_ip_addresses_of_host.sh %s master_ip_address_all" % (self.HAWQ_HOME, self.master_host_name)
         local_ssh(cmd, logger)
         if self.standby_host_name.lower() not in ('', 'none') and not self.remove_standby:
-            cmd = "%s/bin/lib/get_ip_addresses_of_host.sh %s standby_ip_address_all" % (self.GPHOME, self.standby_host_name)
+            cmd = "%s/bin/lib/get_ip_addresses_of_host.sh %s standby_ip_address_all" % (self.HAWQ_HOME, self.standby_host_name)
             local_ssh(cmd, logger)
 
     def check_hdfs_path(self):
         if self.tde_keyname:
             cmd = "%s/bin/gpcheckhdfs hdfs %s %s %s %s --with-tde %s" % \
-              (self.GPHOME, self.dfs_url, self.enable_secure_filesystem, \
+              (self.HAWQ_HOME, self.dfs_url, self.enable_secure_filesystem, \
                self.krb_srvname, self.krb_server_keyfile, self.tde_keyname)
         else:
             cmd = "%s/bin/gpcheckhdfs hdfs %s %s %s %s" % \
-              (self.GPHOME, self.dfs_url, self.enable_secure_filesystem, \
+              (self.HAWQ_HOME, self.dfs_url, self.enable_secure_filesystem, \
                self.krb_srvname, self.krb_server_keyfile)
 
         logger.info("Check if hdfs path is available")
@@ -206,13 +206,13 @@ class HawqInit:
         if 'hawq_standby_address_host' in self.hawq_dict and self.standby_host_name.lower() not in ('', 'none'):
             sync_host_str += " -h %s" % self.standby_host_name
 
-        result = local_ssh("hawq scp %s %s/etc/hdfs-client.xml =:%s/etc/" % (sync_host_str, self.GPHOME, self.GPHOME))
+        result = local_ssh("hawq scp %s %s/etc/hdfs-client.xml =:%s/etc/" % (sync_host_str, self.HAWQ_HOME, self.HAWQ_HOME))
         if result != 0:
             logger.error("Sync hdfs-client.xml failed.")
             sys.exit(1)
 
     def set_replace_datanode_on_failure(self):
-        xml_file = "%s/etc/hdfs-client.xml" % self.GPHOME
+        xml_file = "%s/etc/hdfs-client.xml" % self.HAWQ_HOME
         property_name = 'output.replace-datanode-on-failure'
         pexist, pname, pvalue = check_property_exist_xml(xml_file, property_name)
         datanodes_threshold = 4
@@ -282,12 +282,12 @@ class HawqInit:
 
     def _get_master_init_cmd(self):
         cmd = "%s/bin/lib/hawqinit.sh master '%s'" % \
-                (self.GPHOME, self.GPHOME)
+                (self.HAWQ_HOME, self.HAWQ_HOME)
         return cmd
 
     def _get_standby_init_cmd(self):
         cmd = "%s/bin/lib/hawqinit.sh standby '%s'" % \
-                (self.GPHOME, self.GPHOME)
+                (self.HAWQ_HOME, self.HAWQ_HOME)
         return cmd
 
     def hawq_remove_standby(self):
@@ -331,7 +331,7 @@ class HawqInit:
                 #    print row
                 #conn.close()
                 cmd = 'env PGOPTIONS="-c gp_session_role=utility" %s/bin/psql -p %s -d template1 -o /dev/null -c \
-                    "select gp_remove_master_standby();"' % (self.GPHOME, self.master_port)
+                    "select gp_remove_master_standby();"' % (self.HAWQ_HOME, self.master_port)
                 check_return_code(local_ssh(cmd, logger), logger, \
                                   "Update catalog failed, exit", "Catalog updated successfully.")
                 logger.info("Stop HAWQ master")
@@ -342,9 +342,9 @@ class HawqInit:
                 cmd = "%s; hawq stop master -a -M fast" % source_hawq_env
                 check_return_code(local_ssh(cmd, logger), logger, "Stop hawq master failed, exit")
 
-            remove_property_xml("hawq_standby_address_host", "%s/etc/hawq-site.xml" % self.GPHOME, self.quiet)
-            host_list = parse_hosts_file(self.GPHOME)
-            sync_hawq_site(self.GPHOME, host_list)
+            remove_property_xml("hawq_standby_address_host", "%s/etc/hawq-site.xml" % self.HAWQ_HOME, self.quiet)
+            host_list = parse_hosts_file(self.HAWQ_HOME)
+            sync_hawq_site(self.HAWQ_HOME, host_list)
             if is_node_alive(self.standby_host_name, self.user, logger):
                 logger.info("Check if gpsyncmaster running on %s" % running_standby_host)
                 gpsyncmaster_pid = gp.getSyncmasterPID(running_standby_host, self.master_data_directory)
@@ -372,7 +372,7 @@ class HawqInit:
 
     def _check_master_recovery(self):
         cmd = "%s; %s/bin/pg_controldata %s |grep 'Database cluster state';" % \
-              (source_hawq_env, self.GPHOME, self.master_data_directory)
+              (source_hawq_env, self.HAWQ_HOME, self.master_data_directory)
         result, stdout, stderr = remote_ssh_output(cmd, self.master_host_name, '')
 
         if stdout.find("recovery") != -1:
@@ -387,21 +387,21 @@ class HawqInit:
         check_return_code(self._check_master_recovery())
         # Sync config files from master.
         scpcmd = "scp %s/etc/_mgmt_config %s:%s/etc/_mgmt_config > /dev/null" % \
-                 (self.GPHOME, self.standby_host_name, self.GPHOME)
+                 (self.HAWQ_HOME, self.standby_host_name, self.HAWQ_HOME)
         check_return_code(local_ssh(scpcmd, logger, warning = True), \
                           logger, "Sync _mgmt_config failed")
         scpcmd = "scp %s/etc/hawq-site.xml %s:%s/etc/hawq-site.xml > /dev/null" % \
-                 (self.GPHOME, self.standby_host_name, self.GPHOME)
+                 (self.HAWQ_HOME, self.standby_host_name, self.HAWQ_HOME)
         check_return_code(remote_ssh(scpcmd, self.master_host_name, self.user), \
                           logger, "Sync hawq-site.xml failed")
         scpcmd = "scp %s/etc/slaves %s:%s/etc/slaves > /dev/null" % \
-                 (self.GPHOME, self.standby_host_name, self.GPHOME)
+                 (self.HAWQ_HOME, self.standby_host_name, self.HAWQ_HOME)
         check_return_code(remote_ssh(scpcmd, self.master_host_name, self.user), \
                           logger, "Sync slaves file failed")
         # Sync rps configuration
-        if os.path.exists("%s/ranger/" % (self.GPHOME)):
+        if os.path.exists("%s/ranger/" % (self.HAWQ_HOME)):
             scpcmd = "scp %s/ranger/etc/* %s:%s/ranger/etc/ > /dev/null" % \
-                 (self.GPHOME, self.standby_host_name, self.GPHOME)
+                 (self.HAWQ_HOME, self.standby_host_name, self.HAWQ_HOME)
             check_return_code(remote_ssh(scpcmd, self.master_host_name, self.user), \
                           logger, "Sync rps configuration files failed")
 
@@ -414,7 +414,7 @@ class HawqInit:
         cmd = "%s; hawq stop master -a;" % source_hawq_env
         check_return_code(local_ssh(cmd, logger), logger, "Stop hawq cluster failed, exit")
         cmd = "cd %s; %s; %s/bin/lib/pysync.py -x gpperfmon/data -x pg_log -x db_dumps %s %s:%s" % \
-                 (self.master_data_directory, source_hawq_env,  self.GPHOME, self.master_data_directory,
+                 (self.master_data_directory, source_hawq_env,  self.HAWQ_HOME, self.master_data_directory,
                   self.standby_host_name, self.master_data_directory)
         result = local_ssh(cmd, logger)
         check_return_code(result, logger, "Re-sync standby master failed, exit")
@@ -426,7 +426,7 @@ class HawqInit:
 
     def _get_segment_init_cmd(self):
         cmd = "%s/bin/lib/hawqinit.sh segment '%s'" % \
-                (self.GPHOME, self.GPHOME)
+                (self.HAWQ_HOME, self.HAWQ_HOME)
         return cmd
 
     def _init_cluster(self):
@@ -456,7 +456,7 @@ class HawqInit:
         q = Queue.Queue()
         for host in self.host_list:
             logger.debug("Start to init segment on node '%s'" % host)
-            scpcmd = "scp %s/etc/_mgmt_config %s:%s/etc/_mgmt_config > /dev/null" % (self.GPHOME, host, self.GPHOME)
+            scpcmd = "scp %s/etc/_mgmt_config %s:%s/etc/_mgmt_config > /dev/null" % (self.HAWQ_HOME, host, self.HAWQ_HOME)
             local_ssh(scpcmd, logger)
             work_list.append({"func":remote_ssh,"args":(segment_cmd_str, host, self.user, q)})
         logger.info("Total segment number is: %s" % len(self.host_list))
@@ -516,7 +516,7 @@ class HawqStart:
         self.node_type = opts.node_type
         self.hawq_command = opts.hawq_command
         self.user= opts.user
-        self.GPHOME = opts.GPHOME
+        self.HAWQ_HOME = opts.HAWQ_HOME
         self.quiet  = opts.quiet_run
         self.stop_mode = opts.stop_mode
         self.log_dir = opts.log_dir
@@ -551,7 +551,7 @@ class HawqStart:
         self.segment_data_directory = self.hawq_dict['hawq_segment_directory']
         self.segment_port = self.hawq_dict['hawq_segment_address_port']
         self.dfs_url = self.hawq_dict['hawq_dfs_url']
-        self.host_list = parse_hosts_file(self.GPHOME)
+        self.host_list = parse_hosts_file(self.HAWQ_HOME)
         self.hosts_count_number = len(self.host_list)
 
         if 'hawq_standby_address_host' in self.hawq_dict:
@@ -568,7 +568,7 @@ class HawqStart:
         return "standalone"
 
     def _check_recovery_start(self):
-        cmd = "%s; %s/bin/pg_controldata %s |grep 'Database cluster state';" % (source_hawq_env, self.GPHOME, self.master_data_directory)
+        cmd = "%s; %s/bin/pg_controldata %s |grep 'Database cluster state';" % (source_hawq_env, self.HAWQ_HOME, self.master_data_directory)
         result, stdout, stderr = remote_ssh_output(cmd, self.master_host_name, '')
 
         if stdout.find("recovery") != -1:
@@ -596,7 +596,7 @@ class HawqStart:
             start_options = "-i -M master -p %s --silent-mode=true" % self.master_port
 
         cmd_str = "%s; %s/bin/pg_ctl start -w -t %s -D %s -l %s/pg_log/startup.log -o \\\"%s\\\" >> %s" \
-                 % (source_hawq_env, self.GPHOME, self.timeout, self.master_data_directory, self.master_data_directory, start_options, log_filename)
+                 % (source_hawq_env, self.HAWQ_HOME, self.timeout, self.master_data_directory, self.master_data_directory, start_options, log_filename)
         return cmd_str
 
     def start_master(self):
@@ -659,13 +659,13 @@ class HawqStart:
     def _start_standby_cmd(self):
         logger.info("Start standby master service")
         cmd_str = "%s; %s/bin/gpsyncmaster -D %s -i -p %s >> %s 2>&1 &" \
-                 % (source_hawq_env, self.GPHOME, self.master_data_directory, self.standby_port, log_filename)
+                 % (source_hawq_env, self.HAWQ_HOME, self.master_data_directory, self.standby_port, log_filename)
         return cmd_str
 
     def start_standby(self):
         cmd = self._start_standby_cmd()
         check_return_code(remote_ssh(cmd, self.standby_host_name, self.user))
-        cmd = "%s; %s/sbin/hawqstandbywatch.py %s debug" % (source_hawq_env, self.GPHOME, self.master_data_directory)
+        cmd = "%s; %s/sbin/hawqstandbywatch.py %s debug" % (source_hawq_env, self.HAWQ_HOME, self.master_data_directory)
         result = remote_ssh_nowait(cmd, self.standby_host_name, self.user)
         return result
 
@@ -680,7 +680,7 @@ class HawqStart:
             logger.error("Failed to connect to database, this script can only be run when the database is up")
 
         cmd = '%s/bin/psql -p %s -d template1 -c \
-                  "select summary_state, detail_state from gp_master_mirroring;"' % (self.GPHOME, self.master_port)
+                  "select summary_state, detail_state from gp_master_mirroring;"' % (self.HAWQ_HOME, self.master_port)
         (resutl, stdout, stderr) = local_ssh_output(cmd)
         if stdout.find('Standby master too far behind') != -1:
             return 3
@@ -694,7 +694,7 @@ class HawqStart:
     def _start_segment_cmd(self):
         logger.info("Start segment service")
         cmd_str = "%s; %s/bin/pg_ctl start -w -t %s -D %s -l %s/pg_log/startup.log -o \\\" -i -M %s -p %s --silent-mode=true\\\" >> %s" \
-             % (source_hawq_env, self.GPHOME, self.timeout, self.segment_data_directory, self.segment_data_directory,
+             % (source_hawq_env, self.HAWQ_HOME, self.timeout, self.segment_data_directory, self.segment_data_directory,
                 "segment", self.segment_port, log_filename)
 
         return cmd_str
@@ -758,7 +758,7 @@ class HawqStart:
 
     def _start_rps(self, rps_hostname):
         logger.info("Start ranger plugin service on %s" % rps_hostname)
-        cmd_str = "%s/ranger/bin/rps.sh start" % (self.GPHOME)
+        cmd_str = "%s/ranger/bin/rps.sh start" % (self.HAWQ_HOME)
         result = remote_ssh(cmd_str, rps_hostname, self.user)
         return result
 
@@ -797,7 +797,7 @@ class HawqStop:
         self.node_type = opts.node_type
         self.hawq_command = opts.hawq_command
         self.user= opts.user
-        self.GPHOME = opts.GPHOME
+        self.HAWQ_HOME = opts.HAWQ_HOME
         self.stop_mode = opts.stop_mode
         self.quiet  = opts.quiet_run
         self.log_dir = opts.log_dir
@@ -835,7 +835,7 @@ class HawqStop:
         self.segment_data_directory = self.hawq_dict['hawq_segment_directory']
         self.segment_port = self.hawq_dict['hawq_segment_address_port']
         self.dfs_url = self.hawq_dict['hawq_dfs_url']
-        self.host_list = parse_hosts_file(self.GPHOME)
+        self.host_list = parse_hosts_file(self.HAWQ_HOME)
         self.hosts_count_number = len(self.host_list)
 
         if 'hawq_standby_address_host' in self.hawq_dict:
@@ -904,11 +904,11 @@ class HawqStop:
         logger.info("%s hawq master" % self.stop_action.title())
         if self.hawq_reload:
             cmd_str = "%s; %s/bin/pg_ctl reload -D %s >> %s" % \
-                      (source_hawq_env, self.GPHOME, self.master_data_directory, log_filename)
+                      (source_hawq_env, self.HAWQ_HOME, self.master_data_directory, log_filename)
             return cmd_str
         else:
             cmd_str = "%s; %s/bin/pg_ctl stop -w -t %s -D %s -l %s/pg_log/startup.log -m %s >> %s" % \
-                      (source_hawq_env, self.GPHOME, self.timeout, self.master_data_directory,
+                      (source_hawq_env, self.HAWQ_HOME, self.timeout, self.master_data_directory,
                        self.master_data_directory, self.stop_mode, log_filename)
             return cmd_str
 
@@ -928,7 +928,7 @@ class HawqStop:
         logger.info("%s hawq segment" % self.stop_action.title())
         if self.hawq_reload:
             cmd_str = "%s; %s/bin/pg_ctl reload -D %s >> %s" % \
-                      (source_hawq_env, self.GPHOME, self.segment_data_directory, log_filename)
+                      (source_hawq_env, self.HAWQ_HOME, self.segment_data_directory, log_filename)
             return cmd_str
         else:
             # If stop cluster, firstly master stopped, then segment maybe hung at recv() from master.
@@ -939,7 +939,7 @@ class HawqStop:
                 seg_stop_mod = 'fast'
 
             cmd_str = "%s; %s/bin/pg_ctl stop -w -t %s -D %s -l %s/pg_log/startup.log -m %s >> %s" % \
-                      (source_hawq_env, self.GPHOME, self.timeout, self.segment_data_directory,
+                      (source_hawq_env, self.HAWQ_HOME, self.timeout, self.segment_data_directory,
                        self.segment_data_directory, seg_stop_mod, log_filename)
             return cmd_str
 
@@ -957,11 +957,11 @@ class HawqStop:
         logger.info("%s hawq standby master" % self.stop_action.title())
         if self.hawq_reload:
             cmd_str = "%s; %s/bin/pg_ctl reload -D %s >> %s" % \
-                      (source_hawq_env, self.GPHOME, self.master_data_directory, log_filename)
+                      (source_hawq_env, self.HAWQ_HOME, self.master_data_directory, log_filename)
             return cmd_str
         else:
             cmd_str = "%s; %s/bin/pg_ctl stop -w -t %s -D %s -l %s/pg_log/startup.log -m %s >> %s" % \
-                      (source_hawq_env, self.GPHOME, self.timeout, self.master_data_directory,
+                      (source_hawq_env, self.HAWQ_HOME, self.timeout, self.master_data_directory,
                        self.master_data_directory, self.stop_mode, log_filename)
             return cmd_str
 
@@ -1079,7 +1079,7 @@ class HawqStop:
             logger.warning("Try to stop RPS when hawq_acl_type is unknown")
             check_ret = False
         logger.info("Stop ranger plugin service on %s" % rps_hostname)
-        cmd_str = "%s/ranger/bin/rps.sh stop" % (self.GPHOME)
+        cmd_str = "%s/ranger/bin/rps.sh stop" % (self.HAWQ_HOME)
         result = remote_ssh(cmd_str, rps_hostname, self.user)
         if check_ret:
             check_return_code(result, logger, \
@@ -1162,14 +1162,14 @@ def get_args():
         logger.error("['-U', '--special-mode'] only apply to 'hawq start'.  See the --help info.")
         sys.exit(1)
 
-    opts.GPHOME = os.getenv('GPHOME')
-    if not opts.GPHOME:
-        logger.error("Didn't get GPHOME value, exit")
+    opts.HAWQ_HOME = os.getenv('HAWQ_HOME')
+    if not opts.HAWQ_HOME:
+        logger.error("Didn't get HAWQ_HOME value, exit")
         sys.exit()
-    logger.info("GPHOME is set to:")
-    logger.info(opts.GPHOME)
+    logger.info("HAWQ_HOME is set to:")
+    logger.info(opts.HAWQ_HOME)
     global source_hawq_env
-    source_hawq_env = ". %s/greenplum_path.sh" % opts.GPHOME 
+    source_hawq_env = ". %s/hawq_env.sh" % opts.HAWQ_HOME 
 
     if opts.user == "":
         opts.user = getpass.getuser()
@@ -1178,8 +1178,8 @@ def get_args():
         sys.exit()
     logger.debug("Current user is '%s'" % opts.user)
     logger.debug("Parsing config file:")
-    logger.debug("%s/etc/hawq-site.xml" % opts.GPHOME)
-    hawqsite = HawqXMLParser(opts.GPHOME)
+    logger.debug("%s/etc/hawq-site.xml" % opts.HAWQ_HOME)
+    hawqsite = HawqXMLParser(opts.HAWQ_HOME)
     hawqsite.get_all_values()
     hawq_dict = hawqsite.hawq_dict
     cluster_host_list = list()
@@ -1188,7 +1188,7 @@ def get_args():
     if 'hawq_standby_address_host' in hawq_dict:
         cluster_host_list.append(hawq_dict['hawq_standby_address_host'])
 
-    segments_host_list = parse_hosts_file(opts.GPHOME)
+    segments_host_list = parse_hosts_file(opts.HAWQ_HOME)
     for host in segments_host_list:
         cluster_host_list.append(host)
 

@@ -32,7 +32,7 @@ try:
     import stat
 
 except ImportError, e:    
-    sys.exit('Cannot import modules.  Please check that you have sourced greenplum_path.sh.  Detail: ' + str(e))
+    sys.exit('Cannot import modules.  Please check that you have sourced hawq_env.sh.  Detail: ' + str(e))
 
 
 class GpCheckError(Exception):
@@ -228,7 +228,7 @@ EXECNAME = os.path.split(__file__)[-1]
 setup_tool_logging(EXECNAME,getLocalHostname(),getUserName())
 
 options = None
-GPHOME = None
+HAWQ_HOME = None
 GPCHECK_CONFIG_FILE = None
 HADOOP_HOME = None
 
@@ -263,7 +263,7 @@ def parse_host_list_file(host_file):
     return host_list
 
 def parseargs():
-    global options, GPHOME, HADOOP_HOME, GPCHECK_CONFIG_FILE
+    global options, HAWQ_HOME, HADOOP_HOME, GPCHECK_CONFIG_FILE
 
     parser = OptParser(option_class=OptChecker, version='%prog version $Revision: #1 $')
     parser.remove_option('-h')
@@ -272,7 +272,7 @@ def parseargs():
     parser.add_option('--stdout', action='store_true')
     parser.add_option('--zipout', action='store_true')
     parser.add_option('--zipin', type='string')
-    parser.add_option('--gphome', type='string')
+    parser.add_option('--hawq_home', type='string')
     # for HDFS xml and memory check
     parser.add_option('--hadoop', '--hadoop-home', type='string')
     parser.add_option('--hdfs', action='store_true')
@@ -291,11 +291,11 @@ def parseargs():
             parser.print_help(sys.stderr)
             sys.exit(0)
 
-    # GPHOME must be found
-    GPHOME = options.gphome if options.gphome else os.environ.get("GPHOME")
-    if not GPHOME:
-        raise GpCheckError("GPHOME not set, must be specified in --gphome")
-    GPCHECK_CONFIG_FILE = options.config if options.config else "%s/etc/gpcheck.cnf" % GPHOME
+    # HAWQ_HOME must be found
+    HAWQ_HOME = options.hawq_home if options.hawq_home else os.environ.get("HAWQ_HOME")
+    if not HAWQ_HOME:
+        raise GpCheckError("HAWQ_HOME not set, must be specified in --hawq_home")
+    GPCHECK_CONFIG_FILE = options.config if options.config else "%s/etc/gpcheck.cnf" % HAWQ_HOME
     logger.info("Checks uses config file: %s", GPCHECK_CONFIG_FILE)
 
     HADOOP_HOME = options.hadoop if options.hadoop else os.environ.get("HADOOP_HOME")
@@ -474,7 +474,7 @@ def runCollectionOnServers():
         else:
             raise GpCheckError("unsupported host type")
 
-        cmd = "%s/sbin/gpcheck_hostdump --hawq %s" % (GPHOME, host_type_cl)
+        cmd = "%s/sbin/gpcheck_hostdump --hawq %s" % (HAWQ_HOME, host_type_cl)
         cmd += " --sysctl %s" % ",".join(gpcheck_config.sysctl_expected.keys())
         if HADOOP_HOME:
             cmd += " --hadoop %s" % HADOOP_HOME

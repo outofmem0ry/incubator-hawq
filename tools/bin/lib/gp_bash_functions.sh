@@ -55,9 +55,9 @@ CMDPATH=(/usr/kerberos/bin /usr/sfw/bin /opt/sfw/bin /usr/local/bin /bin /usr/bi
 
 #GPPATH is the list of possible locations for the Greenplum Database binaries, in precedence order
 declare -a GPPATH
-GPPATH=( $GPHOME $MPPHOME $BIZHOME )
+GPPATH=( $HAWQ_HOME $MPPHOME $BIZHOME )
 if [ ${#GPPATH[@]} -eq 0 ];then
-	echo "[FATAL]:-GPHOME is not set, need to set this within environment"
+	echo "[FATAL]:-HAWQ_HOME is not set, need to set this within environment"
 	exit 2
 fi
 
@@ -143,7 +143,7 @@ MKFIFO=`findCmdInPath mkfifo`
 NETSTAT=`findCmdInPath netstat`
 PING=`findCmdInPath ping`
 PS=`findCmdInPath ps`
-PYTHON=${GPHOME}/ext/python/bin/python
+PYTHON=${HAWQ_HOME}/ext/python/bin/python
 RM=`findCmdInPath rm`
 SCP=`findCmdInPath scp`
 SED=`findCmdInPath sed`
@@ -178,7 +178,7 @@ CALL_HOST=`$HOSTNAME|$CUT -d. -f1`
 PSQLBIN=`findMppPath`
 
 if [ x"$PSQLBIN" = x"" ];then
-		echo "Problem in gp_bash_functions, command '$GP_UNIQUE_COMMAND' not found in Greenplum path. Try setting GPHOME to the location of your Greenplum distribution"
+		echo "Problem in gp_bash_functions, command '$GP_UNIQUE_COMMAND' not found in Greenplum path. Try setting HAWQ_HOME to the location of your Greenplum distribution"
 		exit 99
 fi
 
@@ -205,7 +205,7 @@ GPSTATE=$SCRIPTDIR/gpstate
 GPSTOP=$SCRIPTDIR/gpstop
 MAILFILE=$SCRIPTDIR/mail_contacts
 HMAILFILE=$HOME/mail_contacts
-GPDOCDIR=${GPHOME}/docs/cli_help/
+GPDOCDIR=${HAWQ_HOME}/docs/cli_help/
 GPSUBSCRIPTDIR=${SCRIPTDIR}/lib
 #******************************************************************************
 # Greenplum Command Variables
@@ -364,10 +364,10 @@ POSTGRES_VERSION_CHK() {
     LOG_MSG "[INFO]:-Start Function $FUNCNAME"
     HOST=$1;shift
 
-    CURRENT_VERSION=`$EXPORT_GPHOME; $EXPORT_LIB_PATH; $GPHOME/bin/postgres --gp-version`
+    CURRENT_VERSION=`$EXPORT_HAWQ_HOME; $EXPORT_LIB_PATH; $HAWQ_HOME/bin/postgres --gp-version`
     VERSION_MATCH=0
 
-    VER=`$TRUSTED_SHELL $HOST "$EXPORT_GPHOME; $EXPORT_LIB_PATH; $GPHOME/bin/postgres --gp-version"`
+    VER=`$TRUSTED_SHELL $HOST "$EXPORT_HAWQ_HOME; $EXPORT_LIB_PATH; $HAWQ_HOME/bin/postgres --gp-version"`
     if [ $? -ne 0 ] ; then
 	LOG_MSG "[WARN]:- Failed to obtain postgres version on $HOST" 1
 	EXIT_STATUS=1
@@ -2032,7 +2032,7 @@ SCRIPTS_DIR=`$DIRNAME \` $DIRNAME $INITDB\``/bin
 ##
 # we setup some EXPORT foo='blah' commands for when we dispatch to segments and standby master
 ##
-EXPORT_GPHOME='export GPHOME='$GPHOME
+EXPORT_HAWQ_HOME='export HAWQ_HOME='$HAWQ_HOME
 if [ x"$LIB_TYPE" == x"LD_LIBRARY_PATH" ]; then
     EXPORT_LIB_PATH="export LD_LIBRARY_PATH=$LD_LIBRARY_PATH"
 else

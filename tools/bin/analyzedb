@@ -45,7 +45,7 @@ try:
     from gppylib.operations.backup_utils import execute_sql, get_lines_from_file
 
 except ImportError, e:
-    sys.exit('Cannot import modules.  Please check that you have sourced greenplum_path.sh.  Detail: ' + str(e))
+    sys.exit('Cannot import modules.  Please check that you have sourced hawq_env.sh.  Detail: ' + str(e))
 
 EXECNAME = 'analyzedb'
 ANALYZE_SQL = """psql %s -p %s -c 'analyze %s'"""

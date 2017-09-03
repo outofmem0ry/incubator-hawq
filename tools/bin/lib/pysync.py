@@ -130,7 +130,7 @@ class PysyncProxy:
         
         pysyncCmd = PySync('pysync', self.sourceDir, self.destHost, self.destDir,
                               options=' '.join(self.syncOptions))
-        self.cmd = '. %s/greenplum_path.sh && %s' % (os.environ.get('GPHOME'), pysyncCmd.cmdStr)
+        self.cmd = '. %s/hawq_env.sh && %s' % (os.environ.get('HAWQ_HOME'), pysyncCmd.cmdStr)
         
         # save of ppid to allow the process to be stopped.
         self.ppid = os.getppid()
@@ -643,8 +643,8 @@ class LocalPysync:
         PATH = os.environ.get('PATH') or '.'
         LIBPATH = os.environ.get('LD_LIBRARY_PATH') or '.'
         
-        cmd = ('''. %s/greenplum_path.sh && bash -c "python -u -c '%s'"''' 
-               % (os.environ.get('GPHOME'),  
+        cmd = ('''. %s/hawq_env.sh && bash -c "python -u -c '%s'"''' 
+               % (os.environ.get('HAWQ_HOME'),  
                   bootstrapSource))
         args = []
         args.append('ssh')
@@ -677,8 +677,8 @@ class LocalPysync:
         
         return code
 
-if os.environ.get('GPHOME') is None:
-    print >> sys.stderr, '[FATAL]:- Please specify environment variable GPHOME'
+if os.environ.get('HAWQ_HOME') is None:
+    print >> sys.stderr, '[FATAL]:- Please specify environment variable HAWQ_HOME'
     sys.exit(1)
 
 if __name__ == '__main__':

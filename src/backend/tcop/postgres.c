@@ -6443,17 +6443,17 @@ static bool CheckSlaveFile(){
 	if ( filename == NULL )
 	{
 
-		char *gphome = getenv("GPHOME");
-		if ( gphome == NULL )
+		char *hawq_home = getenv("HAWQ_HOME");
+		if ( hawq_home == NULL )
 		{
-			elog(WARNING, "The environment variable GPHOME is not set. "
+			elog(WARNING, "The environment variable HAWQ_HOME is not set. "
 							"can not find file slaves.");
 			return false;
 		}
 
-		filename = (char*)palloc(strlen(gphome) + sizeof("/etc/slaves"));
+		filename = (char*)palloc(strlen(hawq_home) + sizeof("/etc/slaves"));
 
-		sprintf(filename, "%s%s", gphome, "/etc/slaves");
+		sprintf(filename, "%s%s", hawq_home, "/etc/slaves");
 	}
 
 	elog(DEBUG3, "Postmaster reads slaves file %s.", filename);

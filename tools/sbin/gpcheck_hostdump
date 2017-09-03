@@ -34,7 +34,7 @@ try:
     from gppylib.gpcheckutil import securetty, ioschedulers, blockdev, bcu, rclocal, sysctl, limitsconf, limitsconf_entry, uname, connectemc, diskusage, diskusage_entry, hdfs, hawq,  machine
     from gppylib.gpcheckutil import solaris_etc_system, solaris_etc_project, solaris_etc_user_attr
 except ImportError, e:    
-    sys.exit('Cannot import modules.  Please check that you have sourced greenplum_path.sh.  Detail: ' + str(e))
+    sys.exit('Cannot import modules.  Please check that you have sourced hawq_env.sh.  Detail: ' + str(e))
 
 
 # Global Variables
@@ -417,9 +417,9 @@ def collectHAWQ():
     if not options.hawq:
         return None
     data = hawq()
-    hawq_config_dir = os.environ.get('GPHOME')
+    hawq_config_dir = os.environ.get('HAWQ_HOME')
     if hawq_config_dir is None:
-        print "Please export GPHOME first, exit"
+        print "Please export HAWQ_HOME first, exit"
         sys.exit(1)
     hdfs_client_file = os.path.join(hawq_config_dir, "etc/hdfs-client.xml")
     yarn_client_file = os.path.join(hawq_config_dir, "etc/yarn-client.xml")
@@ -451,9 +451,9 @@ def collectHDFS():
     if not options.hadoop:
         return None
     data = hdfs()
-    hawq_config_dir = os.environ.get('GPHOME')
+    hawq_config_dir = os.environ.get('HAWQ_HOME')
     if hawq_config_dir is None:
-        print "Please export GPHOME first, exit"
+        print "Please export HAWQ_HOME first, exit"
         sys.exit(1)
     hadoop_config_file = os.path.join(options.hadoop, "libexec/hadoop-config.sh")
     hadoop_env_file = os.path.join(options.hadoop, "etc/hadoop/hadoop-env.sh")

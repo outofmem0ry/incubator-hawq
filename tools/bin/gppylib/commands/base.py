@@ -51,8 +51,8 @@ import getpass
 
 logger=gplog.get_default_logger()
 
-GPHOME=os.environ.get('GPHOME')
-SRC_GPPATH=". %s/greenplum_path.sh;" % GPHOME
+HAWQ_HOME=os.environ.get('HAWQ_HOME')
+SRC_GPPATH=". %s/hawq_env.sh;" % HAWQ_HOME
 
 # Maximum retries if sshd rejects the connection due to too many
 # unauthenticated connections.

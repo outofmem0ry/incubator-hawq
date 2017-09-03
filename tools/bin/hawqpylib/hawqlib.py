@@ -151,9 +151,9 @@ def get_xml_values(xmlfile):
 
 
 class HawqXMLParser:
-    def __init__(self, GPHOME):
-        self.GPHOME = GPHOME
-        self.xml_file = "%s/etc/hawq-site.xml" % GPHOME
+    def __init__(self, HAWQ_HOME):
+        self.HAWQ_HOME = HAWQ_HOME
+        self.xml_file = "%s/etc/hawq-site.xml" % HAWQ_HOME
         self.hawq_dict = {}
         self.propertyValue = ""
 
@@ -406,8 +406,8 @@ def create_cluster_directory(directory_path, hostlist, user = '', logger = None)
     return create_success_host, create_failed_host
 
 
-def parse_hosts_file(GPHOME):
-    host_file = "%s/etc/slaves" % GPHOME
+def parse_hosts_file(HAWQ_HOME):
+    host_file = "%s/etc/slaves" % HAWQ_HOME
     host_list = list()
     with open(host_file) as f:
         hosts = f.readlines()
@@ -543,11 +543,11 @@ def remove_property_xml(property_name, xmlfile, quiet = False):
     shutil.move(xmlfile_swap, xmlfile)
 
 
-def sync_hawq_site(GPHOME, host_list):
+def sync_hawq_site(HAWQ_HOME, host_list):
     for node in host_list:
         try:
             # Print "Sync hawq-site.xml to %s." % node
-            os.system("scp %s/etc/hawq-site.xml %s:%s/etc/hawq-site.xml > /dev/null 2>&1" % (GPHOME, node, GPHOME))
+            os.system("scp %s/etc/hawq-site.xml %s:%s/etc/hawq-site.xml > /dev/null 2>&1" % (HAWQ_HOME, node, HAWQ_HOME))
         except:
             print ""
             sys.exit("sync to node %s failed." % node)

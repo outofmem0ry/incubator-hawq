@@ -29,7 +29,7 @@ from unix import *
 
 logger = get_default_logger()
 
-GPHOME=os.environ.get('GPHOME')
+HAWQ_HOME=os.environ.get('HAWQ_HOME')
 
 
 
@@ -61,7 +61,7 @@ GPHOME=os.environ.get('GPHOME')
 class InitDB(Command):
     def __init__(self,name,db,ctxt=LOCAL,remoteHost=None):
         self.db=db
-        self.cmdStr="$GPHOME/bin/initdb %s" % (db.getSegmentDataDirectory())
+        self.cmdStr="$HAWQ_HOME/bin/initdb %s" % (db.getSegmentDataDirectory())
         Command.__init__(self,name,self.cmdStr,ctxt,remoteHost)
     
     @staticmethod
@@ -77,7 +77,7 @@ class InitDB(Command):
 class DbStatus(Command):
     def __init__(self,name,db,ctxt=LOCAL,remoteHost=None):
         self.db=db        
-        self.cmdStr="$GPHOME/bin/pg_ctl -D %s status" % (db.getSegmentDataDirectory())
+        self.cmdStr="$HAWQ_HOME/bin/pg_ctl -D %s status" % (db.getSegmentDataDirectory())
         Command.__init__(self,name,self.cmdStr,ctxt,remoteHost)
 
     def is_running(self):
@@ -103,7 +103,7 @@ class DbStatus(Command):
 class ReloadDbConf(Command):
     def __init__(self,name,db,ctxt=LOCAL,remoteHost=None):
         self.db=db
-        cmdStr="$GPHOME/bin/pg_ctl reload -D %s" % (db.getSegmentDataDirectory())
+        cmdStr="$HAWQ_HOME/bin/pg_ctl reload -D %s" % (db.getSegmentDataDirectory())
         Command.__init__(self,name,cmdStr,ctxt,remoteHost)
     
     @staticmethod
@@ -263,7 +263,7 @@ class PgControlData(Command):
         self.datadir = datadir
         self.remotehost=remoteHost
         self.data = None
-        Command.__init__(self, name, "$GPHOME/bin/pg_controldata %s" % self.datadir, ctxt, remoteHost)
+        Command.__init__(self, name, "$HAWQ_HOME/bin/pg_controldata %s" % self.datadir, ctxt, remoteHost)
 
     def get_value(self, name):
         if not self.results:

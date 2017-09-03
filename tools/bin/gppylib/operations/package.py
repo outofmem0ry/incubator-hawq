@@ -38,7 +38,7 @@ try:
     import yaml   
     from yaml.scanner import ScannerError
 except ImportError, ex:
-    sys.exit('Operation: Cannot import modules.  Please check that you have sourced greenplum_path.sh.  Detail: ' + str(ex)) 
+    sys.exit('Operation: Cannot import modules.  Please check that you have sourced hawq_env.sh.  Detail: ' + str(ex)) 
 
 logger = gplog.get_default_logger()
 
@@ -47,8 +47,8 @@ def dereference_symlink(path):
     MPP-15429: rpm is funky with symlinks... 
     During an rpm -e invocation, rpm mucks with the /usr/local/greenplum-db symlink.
     From strace output, it appears that rpm tries to rmdir any directories it may have created during
-    package installation. And, in the case of our GPHOME symlink, rpm will actually try to unlink it. 
-    To avoid this scenario, we perform all rpm actions against the "symlink dereferenced" $GPHOME.
+    package installation. And, in the case of our HAWQ_HOME symlink, rpm will actually try to unlink it. 
+    To avoid this scenario, we perform all rpm actions against the "symlink dereferenced" $HAWQ_HOME.
     """
     path = os.path.normpath(path)
     if not os.path.islink(path):
@@ -58,7 +58,7 @@ def dereference_symlink(path):
         return link
     return os.path.join(os.path.dirname(path), link)
 
-GPHOME = dereference_symlink(gp.get_gphome())
+HAWQ_HOME = dereference_symlink(gp.get_hawq_home())
 
 GPPKG_EXTENSION = '.gppkg'
 SPECFILE_NAME = 'gppkg_spec.yml'
@@ -68,8 +68,8 @@ SPECFILE_OPTIONAL_TAGS = ['preinstall', 'postinstall', 'preuninstall', 'postunin
 # TODO: AK: Our interactions with the internal RPM database could benefit from an abstraction layer
 # that hides the underlying commands used for installation, uninstallation, queries, etc.
 RPM_DATABASE_PATH = 'share/packages/database'
-RPM_DATABASE = os.path.join(GPHOME, RPM_DATABASE_PATH)
-RPM_INSTALLATION_PATH = GPHOME
+RPM_DATABASE = os.path.join(HAWQ_HOME, RPM_DATABASE_PATH)
+RPM_INSTALLATION_PATH = HAWQ_HOME
 
 # TODO: AK: Our interactions with the archive could benefit from an abstraction layer
 # that hides the implementations of archival, unarchival, queries, etc.
@@ -77,11 +77,11 @@ RPM_INSTALLATION_PATH = GPHOME
 # with a CheckFile. Rather, it should be a call to Archive.contains(package), where package
 # is instanceof Gppkg.
 ARCHIVE_PATH = 'share/packages/archive'
-GPPKG_ARCHIVE_PATH = os.path.join(GPHOME, ARCHIVE_PATH)
+GPPKG_ARCHIVE_PATH = os.path.join(HAWQ_HOME, ARCHIVE_PATH)
 
-# TODO: AK: Shouldn't this be "$GPHOME/.tmp"? 
-# i.e. what if remote host has its $GPHOME elsewhere?
-TEMP_EXTRACTION_PATH = GPHOME + '/.tmp'
+# TODO: AK: Shouldn't this be "$HAWQ_HOME/.tmp"? 
+# i.e. what if remote host has its $HAWQ_HOME elsewhere?
+TEMP_EXTRACTION_PATH = HAWQ_HOME + '/.tmp'
 DEPS_DIR = 'deps'
 
 class GpdbVersionError(Exception):
@@ -321,7 +321,7 @@ class RemoteCommand(Operation):
 class ListPackages(Operation):
     '''  
         Lists all the packages present in 
-        $GPHOME/share/packages/archive
+        $HAWQ_HOME/share/packages/archive
     '''
 
     def __init__(self):
@@ -410,13 +410,13 @@ class IsVersionCompatible(Operation):
         '''
 
         logger.debug('_get_gpdb_version')
-        self.gphome = gp.get_gphome()
-        version = gp.GpVersion.local('local GP software version check', self.gphome)
+        self.hawq_home = gp.get_hawq_home()
+        version = gp.GpVersion.local('local GP software version check', self.hawq_home)
         gpdb_version = GpVersion(version.strip()) 
         return gpdb_version
 
     def _get_hawq_version(self):
-        binary = os.path.join(GPHOME, 'bin', 'pg_ctl')
+        binary = os.path.join(HAWQ_HOME, 'bin', 'pg_ctl')
         cmdstr = '{0} --hawq-version'.format(binary)
         cmd = Command('Get hawq version', cmdstr)
         cmd.run(validateAfter = True)
@@ -794,7 +794,7 @@ class SyncPackages(Operation):
             logger.info('The following packages will be installed on %s: %s' % (self.host, ', '.join(install_package_set)))
             for package in install_package_set:
                 logger.debug('copying %s to %s' % (package, self.host))
-                dstFile = os.path.join(GPHOME, package)
+                dstFile = os.path.join(HAWQ_HOME, package)
                 Scp(name = 'copying %s to %s' % (package, self.host), 
                     srcFile = os.path.join(GPPKG_ARCHIVE_PATH, package), 
                     dstFile = dstFile, 
@@ -831,7 +831,7 @@ class InstallPackage(Operation):
 
         # distribute package to segments
         srcFile = self.gppkg.abspath
-        dstFile = os.path.join(GPHOME, self.gppkg.pkg)
+        dstFile = os.path.join(HAWQ_HOME, self.gppkg.pkg)
         GpScp(srcFile, dstFile, self.segment_host_list).run()
 
         # install package on segments
@@ -1112,7 +1112,7 @@ class UpdatePackage(Operation):
 
         # distribute package to segments
         srcFile = self.gppkg.abspath
-        dstFile = os.path.join(GPHOME, self.gppkg.pkg)
+        dstFile = os.path.join(HAWQ_HOME, self.gppkg.pkg)
         GpScp(srcFile, dstFile, self.segment_host_list).run()
 
         # update package on segments
@@ -1193,29 +1193,29 @@ class CleanGppkg(Operation):
 
 class MigratePackages(Operation):
     """
-    Migrates packages from another $GPHOME to this one
+    Migrates packages from another $HAWQ_HOME to this one
 
     This functionality is meant to facilitate minor version upgrade, whereby old packages
-    need to be brought over from the older $GPHOME to the newer $GPHOME.
+    need to be brought over from the older $HAWQ_HOME to the newer $HAWQ_HOME.
 
     Presumably, this could also be used to migrate packages across arbitrary choices
-    of $GPHOMEs. However, the migration will only succeed if the packages being migrated
+    of $HAWQ_HOMEs. However, the migration will only succeed if the packages being migrated
     are actually compatible with the target GPDB.
     """
-    def __init__(self, from_gphome, to_gphome):
-        self.from_gphome, self.to_gphome = from_gphome, to_gphome
+    def __init__(self, from_hawq_home, to_hawq_home):
+        self.from_hawq_home, self.to_hawq_home = from_hawq_home, to_hawq_home
     def execute(self):
-        if not os.path.samefile(self.to_gphome, GPHOME):
-            raise ExceptionNoStackTraceNeeded('The target GPHOME, %s, must match the current $GPHOME used to launch gppkg.' % self.to_gphome)
-        if os.path.samefile(self.to_gphome, self.from_gphome):
-            raise ExceptionNoStackTraceNeeded('The source and target GPHOMEs, %s => %s, must differ for packages to be migrated.' % (self.from_gphome, self.to_gphome))
+        if not os.path.samefile(self.to_hawq_home, HAWQ_HOME):
+            raise ExceptionNoStackTraceNeeded('The target HAWQ_HOME, %s, must match the current $HAWQ_HOME used to launch gppkg.' % self.to_hawq_home)
+        if os.path.samefile(self.to_hawq_home, self.from_hawq_home):
+            raise ExceptionNoStackTraceNeeded('The source and target HAWQ_HOMEs, %s => %s, must differ for packages to be migrated.' % (self.from_hawq_home, self.to_hawq_home))
 
-        # TODO: AK: Given an invalid from_gphome, we'll end up creating a 'share/packages' subdirectory within it.
-        old_archive_path = os.path.join(self.from_gphome, ARCHIVE_PATH)
+        # TODO: AK: Given an invalid from_hawq_home, we'll end up creating a 'share/packages' subdirectory within it.
+        old_archive_path = os.path.join(self.from_hawq_home, ARCHIVE_PATH)
         MakeDir(old_archive_path).run()
         packages = ListFilesByPattern(old_archive_path, '*' + GPPKG_EXTENSION).run()
         if not packages:
-            logger.info('There are no packages to migrate from %s.' % self.from_gphome)
+            logger.info('There are no packages to migrate from %s.' % self.from_hawq_home)
             return
 
         logger.info('The following packages will be migrated: %s' % ', '.join(packages))

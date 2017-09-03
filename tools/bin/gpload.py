@@ -1652,12 +1652,12 @@ class gpload:
                     needshell = False
                 else:
                     srcfile = None
-                    if os.environ.get('GPHOME_LOADERS'):
-                        srcfile = os.path.join(os.environ.get('GPHOME_LOADERS'),
+                    if os.environ.get('HAWQ_HOME_LOADERS'):
+                        srcfile = os.path.join(os.environ.get('HAWQ_HOME_LOADERS'),
                                            'greenplum_loaders_path.sh')
-                    elif os.environ.get('GPHOME'):
-                        srcfile = os.path.join(os.environ.get('GPHOME'),
-                                           'greenplum_path.sh')
+                    elif os.environ.get('HAWQ_HOME'):
+                        srcfile = os.path.join(os.environ.get('HAWQ_HOME'),
+                                           'hawq_env.sh')
 
                     if (not (srcfile and os.path.exists(srcfile))):
                         self.log(self.ERROR, 'cannot find greenplum environment ' +

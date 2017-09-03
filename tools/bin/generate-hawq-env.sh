@@ -17,23 +17,23 @@
 # under the License.
 
 if [ x$1 != x ] ; then
-    GPHOME_PATH=$1
+    HAWQ_HOME_PATH=$1
 else
-    GPHOME_PATH="\`pwd\`"
+    HAWQ_HOME_PATH="\`pwd\`"
 fi
 
 if [ "$2" = "ISO" ] ; then
 	cat <<-EOF
 		if [ "\${BASH_SOURCE:0:1}" == "/" ]
 		then
-		    GPHOME=\`dirname "\$BASH_SOURCE"\`
+		    HAWQ_HOME=\`dirname "\$BASH_SOURCE"\`
 		else
-		    GPHOME=\`pwd\`/\`dirname "\$BASH_SOURCE"\`
+		    HAWQ_HOME=\`pwd\`/\`dirname "\$BASH_SOURCE"\`
 		fi
 	EOF
 else
 	cat <<-EOF
-		GPHOME=${GPHOME_PATH}
+		HAWQ_HOME=${HAWQ_HOME_PATH}
 	EOF
 fi
 
@@ -47,56 +47,56 @@ fi
 cat << EOF
 
 # Replace with symlink path if it is present and correct
-if [ -h \${GPHOME}/../hawq ]; then
-    GPHOME_BY_SYMLINK=\`(cd \${GPHOME}/../hawq/ && pwd -P)\`
-    if [ x"\${GPHOME_BY_SYMLINK}" = x"\${GPHOME}" ]; then
-        GPHOME=\`(cd \${GPHOME}/../hawq/ && pwd -L)\`/.
+if [ -h \${HAWQ_HOME}/../hawq ]; then
+    HAWQ_HOME_BY_SYMLINK=\`(cd \${HAWQ_HOME}/../hawq/ && pwd -P)\`
+    if [ x"\${HAWQ_HOME_BY_SYMLINK}" = x"\${HAWQ_HOME}" ]; then
+        HAWQ_HOME=\`(cd \${HAWQ_HOME}/../hawq/ && pwd -L)\`/.
     fi
-    unset GPHOME_BY_SYMLINK
+    unset HAWQ_HOME_BY_SYMLINK
 fi
 EOF
 
 cat <<EOF
-PATH=\$GPHOME/bin:\$PATH
+PATH=\$HAWQ_HOME/bin:\$PATH
 EOF
 
 if [ "${PLAT}" = "Darwin" ] ; then
 	cat <<EOF
-DYLD_LIBRARY_PATH=\$GPHOME/lib:\$DYLD_LIBRARY_PATH
+DYLD_LIBRARY_PATH=\$HAWQ_HOME/lib:\$DYLD_LIBRARY_PATH
 EOF
 else
     cat <<EOF
-LD_LIBRARY_PATH=\$GPHOME/lib:\$LD_LIBRARY_PATH
+LD_LIBRARY_PATH=\$HAWQ_HOME/lib:\$LD_LIBRARY_PATH
 EOF
 fi
 
 #setup PYTHONPATH
 cat <<EOF
-PYTHONPATH=\$GPHOME/lib/python:\$PYTHONPATH
+PYTHONPATH=\$HAWQ_HOME/lib/python:\$PYTHONPATH
 EOF
 
 # openssl configuration file path
 cat <<EOF
-OPENSSL_CONF=\$GPHOME/etc/openssl.cnf
+OPENSSL_CONF=\$HAWQ_HOME/etc/openssl.cnf
 EOF
 
 # libhdfs3 configuration file path
 cat << EOF
-LIBHDFS3_CONF=\$GPHOME/etc/hdfs-client.xml
+LIBHDFS3_CONF=\$HAWQ_HOME/etc/hdfs-client.xml
 EOF
 
 # libyarn configuration file path
 cat << EOF
-LIBYARN_CONF=\$GPHOME/etc/yarn-client.xml
+LIBYARN_CONF=\$HAWQ_HOME/etc/yarn-client.xml
 EOF
 
 # global resource manager configuration file path
 cat << EOF
-HAWQSITE_CONF=\$GPHOME/etc/hawq-site.xml
+HAWQSITE_CONF=\$HAWQ_HOME/etc/hawq-site.xml
 EOF
 
 cat <<EOF
-export GPHOME
+export HAWQ_HOME
 export PATH
 EOF
 

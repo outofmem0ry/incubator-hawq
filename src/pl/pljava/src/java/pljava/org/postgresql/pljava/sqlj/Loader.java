@@ -62,7 +62,7 @@ import org.postgresql.pljava.sqlj.JarLoader;
  *
  * Instead we mostly use our own loader JarLoader() which reads a jarfile 
  * from the filesystem.  Note that the security manager allows READING from
- * "$GPHOME/lib/postgresql/java/*.class" files, even in trusted mode, since
+ * "$HAWQ_HOME/lib/postgresql/java/*.class" files, even in trusted mode, since
  * this is shared between all databases any user can theoretically see every
  * installed jar.  
  * 

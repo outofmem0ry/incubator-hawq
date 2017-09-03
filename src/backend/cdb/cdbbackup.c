@@ -245,13 +245,13 @@ gp_backup_launch__(PG_FUNCTION_ARGS)
 		if (testProgramExists("throttlingD.py") == NULL)
 		{
 			/*throttlingD.py does not exist*/
-			const char *gp_home = getenv("GPHOME");
-			if (!gp_home)
-				gp_home = "";
+			const char *hawq_home = getenv("HAWQ_HOME");
+			if (!hawq_home)
+				hawq_home = "";
 
 			ereport(ERROR,
 					(errcode(ERRCODE_EXTERNAL_ROUTINE_EXCEPTION),
-							errmsg("throttlingD.py not found in GPHOME\\bin (GPHOME: %s)", gp_home)));
+							errmsg("throttlingD.py not found in HAWQ_HOME\\bin (HAWQ_HOME: %s)", hawq_home)));
 		}
 
 		pszThrottleCmd = formThrottleCmd(pszBackupFileName, gp_backup_directIO_read_chunk_mb, true);

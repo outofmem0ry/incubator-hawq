@@ -26,7 +26,7 @@ try:
     from gppylib.gplog import get_default_logger
 except ImportError, e:
     sys.exit('ERROR: Cannot import modules.  Please check that you '
-                 'have sourced greenplum_path.sh.  Detail: ' + str(e))
+                 'have sourced hawq_env.sh.  Detail: ' + str(e))
 
 global hawq_home, source_hawq_env, logger
 
@@ -55,9 +55,9 @@ def check_master_or_standby_host(master_host_name='localhost', standby_host_name
 
 def main():
     logger = get_default_logger()
-    hawq_home = os.getenv('GPHOME')
+    hawq_home = os.getenv('HAWQ_HOME')
     if not hawq_home:
-        print "HAWQ home directory not defined, please check GPHOME settings."
+        print "HAWQ home directory not defined, please check HAWQ_HOME settings."
         sys.exit(1)
 
     hawqsite = HawqXMLParser(hawq_home)
@@ -80,7 +80,7 @@ def main():
 
     cluster_type_list = ('cluster', 'segment', 'master', 'standby', 'allsegments')
     cluster_init_list = ('cluster', 'segment', 'master', 'standby')
-    source_hawq_env = ". %s/greenplum_path.sh" % hawq_home
+    source_hawq_env = ". %s/hawq_env.sh" % hawq_home
 
     if len(sys.argv) > 2:
         hawq_command = sys.argv[1]

@@ -39,10 +39,10 @@ ARCH = platform.machine()
 
 # AK: use dereference_symlink when mucking with RPM database for the same reason 
 # it's used in the gppylib.operations.package. For more info, see the function definition.
-GPHOME = dereference_symlink(gp.get_gphome())
+HAWQ_HOME = dereference_symlink(gp.get_hawq_home())
 
-ARCHIVE_PATH = os.path.join(GPHOME, 'share/packages/archive')
-RPM_DATABASE = os.path.join(GPHOME, 'share/packages/database') 
+ARCHIVE_PATH = os.path.join(HAWQ_HOME, 'share/packages/archive')
+RPM_DATABASE = os.path.join(HAWQ_HOME, 'share/packages/database') 
 GPPKG_EXTENSION = ".gppkg"
 SCRATCH_SPACE = os.path.join(tempfile.gettempdir(), getpass.getuser())
 GPDB_VERSION = "4.2"
@@ -416,7 +416,7 @@ class MiscTestCases(GppkgTestCase):
         self.built_packages.add(dummy_file)
 
         self.install(dummy_file)
-        self.assertTrue(os.path.exists(os.path.join(GPHOME, 'share', 'packages', 'archive', dummy_file)))
+        self.assertTrue(os.path.exists(os.path.join(HAWQ_HOME, 'share', 'packages', 'archive', dummy_file)))
 
         results = run_command("rpm -q %s --dbpath %s" % (rpm_spec.get_package_name(), RPM_DATABASE))
         self.assertEquals(results, rpm_spec.get_package_name())
@@ -594,7 +594,7 @@ class MuckWithInternalsTestCases(GppkgTestCase):
             #Install the rpm 
             with closing(tarfile.open(self.gppkg_spec.get_filename())) as tf:
                 tf.extract(self.rpm_spec.get_filename())
-            run_command("rpm -i %s --dbpath %s --prefix=%s" % (self.rpm_spec.get_filename(), RPM_DATABASE, GPHOME))
+            run_command("rpm -i %s --dbpath %s --prefix=%s" % (self.rpm_spec.get_filename(), RPM_DATABASE, HAWQ_HOME))
             os.remove(self.rpm_spec.get_filename())
             self.fail("ExecutionError %s" % e)
 
@@ -604,7 +604,7 @@ class MuckWithInternalsTestCases(GppkgTestCase):
             tf.extract(self.rpm_spec.get_filename())
           
         #Install rpm 
-        run_command("rpm --install %s --dbpath %s --prefix=%s" % (self.rpm_spec.get_filename(), RPM_DATABASE, GPHOME))  
+        run_command("rpm --install %s --dbpath %s --prefix=%s" % (self.rpm_spec.get_filename(), RPM_DATABASE, HAWQ_HOME))  
         
         results = run_command("rpm -q %s --dbpath %s" %(self.rpm_spec.get_package_name(), RPM_DATABASE))
         self.assertRegexpMatches(results, self.rpm_spec.get_package_name())

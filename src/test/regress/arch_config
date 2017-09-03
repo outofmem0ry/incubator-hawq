@@ -18,7 +18,7 @@
 # Format:
 #	target_name: regexp
 #
-# where <regexp> is applied to the output of "file $GPHOME/bin/postgres"
+# where <regexp> is applied to the output of "file $HAWQ_HOME/bin/postgres"
 #
 
 32bit_tpch: 'Mach-O executable i386'

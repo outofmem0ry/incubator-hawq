@@ -30,10 +30,10 @@ class SanCmds():
     MOUNT=None
     
     def __init__(self):
-        gphome = os.getenv('GPHOME', None) + '/bin/'
+        hawq_home = os.getenv('HAWQ_HOME', None) + '/bin/'
         
         try:
-            self.GP_MOUNT_AGENT = unix.findCmdInPath('gp_mount_agent', [gphome], False)
+            self.GP_MOUNT_AGENT = unix.findCmdInPath('gp_mount_agent', [hawq_home], False)
         except:
             pass
         try:

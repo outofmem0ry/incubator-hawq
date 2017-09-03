@@ -76,24 +76,24 @@ def transform_db(path, db, tfile):
     lpath = os.environ.get('LD_LIBRARY_PATH')
     dypath = os.environ.get('DYLD_LIBRARY_PATH')
 
-    # Add $GPHOME/bin to the path for this environment
-    gphome = '/Users/swm/greenplum-db-devel/'
+    # Add $HAWQ_HOME/bin to the path for this environment
+    hawq_home = '/Users/swm/greenplum-db-devel/'
     envpath = '/Users/swm/greenplum-db-devel/bin:/Users/swm/greenplum-db-devel/bin/ext/python/bin:%s' % os.environ.get('PATH')
 
     if lpath:
-        lpath = '%s/lib:%s/ext/python/lib:%s' % (gphome, gphome, lpath)
+        lpath = '%s/lib:%s/ext/python/lib:%s' % (hawq_home, hawq_home, lpath)
     else:
-        lpath = '%s/lib:%s/ext/python/lib' % (gphome, gphome)
+        lpath = '%s/lib:%s/ext/python/lib' % (hawq_home, hawq_home)
     if dypath:
-        dypath = '%s/lib:%s/ext/python/lib:%s' % (gphome, gphome, dypath)
+        dypath = '%s/lib:%s/ext/python/lib:%s' % (hawq_home, hawq_home, dypath)
     else:
-        dypath = '%s/lib:%s/ext/python/lib' % (gphome, gphome)
+        dypath = '%s/lib:%s/ext/python/lib' % (hawq_home, hawq_home)
 
     env = {}
     env['HOME']    = home
     env['USER']    = os.environ.get('USER')
     env['LOGNAME'] = os.environ.get('LOGNAME')
-    env['GPHOME']  = gphome
+    env['HAWQ_HOME']  = hawq_home
     env['PATH']    = envpath
     env['LD_LIBRARY_PATH'] = lpath
     env['DYLD_LIBRARY_PATH'] = dypath

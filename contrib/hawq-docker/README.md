@@ -72,7 +72,7 @@ echo 'centos7-datanode3' >>  /data/hawq-dev/etc/slaves
 * Initialize Apache HAWQ cluster
 ```
 sudo -u hdfs hdfs dfs -chown gpadmin /
-source /data/hawq-dev/greenplum_path.sh
+source /data/hawq-dev/hawq_env.sh
 hawq init cluster
 ```
 Now you can connect to database with `psql` command.

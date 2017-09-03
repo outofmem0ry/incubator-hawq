@@ -115,7 +115,7 @@ def ParseOptions():
     '''
 
     # Determine Default Values
-    gphome = os.environ.get("GPHOME")
+    hawq_home = os.environ.get("HAWQ_HOME")
     home   = os.environ.get("HOME")
 
     logdir = os.path.join(home, "hawqAdminLogs")

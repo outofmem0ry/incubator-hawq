@@ -406,7 +406,7 @@ bool handleRMRequestAcquireResource(void **arg)
 	/*--------------------------------------------------------------------------
 	 * We firstly check if the cluster has too many unavailable segments, which
 	 * is measured by rm_rejectrequest_nseg_limit. The expected cluster size is
-	 * loaded from counting hosts in $GPHOME/etc/slaves. Resource manager rejects
+	 * loaded from counting hosts in $HAWQ_HOME/etc/slaves. Resource manager rejects
 	 * query  resource requests at once if currently there are too many segments
 	 * unavailable.
 	 *--------------------------------------------------------------------------

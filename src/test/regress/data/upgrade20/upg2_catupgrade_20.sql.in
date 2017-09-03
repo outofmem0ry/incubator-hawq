@@ -100,7 +100,7 @@ select * FROM pg_attribute WHERE attrelid=6026;
 -- Then we can insert pg_type rows including OID.  Note only COPY allows us
 -- to insert OID as of today.  Use CSV as data contains comma data.
 -- psql expands this for us
-\set pg_resqueue_datafile `echo "'$GPHOME/share/postgresql/upgrade/pg_resqueue.data'"`
+\set pg_resqueue_datafile `echo "'$HAWQ_HOME/share/postgresql/upgrade/pg_resqueue.data'"`
 -- Add entries to the master
 COPY @gpupgradeschemaname@.pg_resqueue FROM :pg_resqueue_datafile WITH OIDS CSV;
 
@@ -119,12 +119,12 @@ UPDATE pg_proc SET proallargtypes='{23,26,23,26,25,25,16,1184,1184,1184,869,23,2
 
 -- change pg_proc data
 DELETE FROM @gpupgradeschemaname@.pg_proc WHERE oid IN (5040, 5041, 5042, 5046, 6117, 6435, 9900);
-\set pg_proc_datafile `echo "'$GPHOME/share/postgresql/upgrade/pg_proc.data'"`
+\set pg_proc_datafile `echo "'$HAWQ_HOME/share/postgresql/upgrade/pg_proc.data'"`
 COPY @gpupgradeschemaname@.pg_proc FROM :pg_proc_datafile WITH OIDS CSV;
 
 -- change pg_description data
 DELETE FROM @gpupgradeschemaname@.pg_description WHERE objoid IN (5040, 5041, 5042, 6117, 6435);
-\set pg_description_datafile `echo "'$GPHOME/share/postgresql/upgrade/pg_description.data'"`
+\set pg_description_datafile `echo "'$HAWQ_HOME/share/postgresql/upgrade/pg_description.data'"`
 COPY @gpupgradeschemaname@.pg_description FROM :pg_description_datafile CSV;
 
 -- drop and recreate hawq_toolkit schema first
