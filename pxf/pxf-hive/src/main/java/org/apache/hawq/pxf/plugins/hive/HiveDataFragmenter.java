@@ -402,17 +402,12 @@ public class HiveDataFragmenter extends Fragmenter {
         // Let's look first at the filter
         BasicFilter bFilter = (BasicFilter) filter;
 
-        // In case this is not an "equality filter", we ignore this filter (no
-        // add to filter list)
-        if (!(bFilter.getOperation() == FilterParser.Operation.HDOP_EQ)) {
-            LOG.debug("Filter operator is not EQ, ignore this filter for hive : "
-                    + filter);
-            return false;
-        }
 
         // Extract column name and value
         int filterColumnIndex = bFilter.getColumn().index();
-        String filterValue = bFilter.getConstant().constant().toString();
+        // Avoids NullPointerException in case of operations like HDOP_IS_NULL,
+        // HDOP_IS_NOT_NULL where no constant value is passed as part of query
+        String filterValue = bFilter.getConstant()!= null ? bFilter.getConstant().constant().toString(): "";
         ColumnDescriptor filterColumn = inputData.getColumn(filterColumnIndex);
         String filterColumnName = filterColumn.columnName();
 
@@ -424,11 +419,6 @@ public class HiveDataFragmenter extends Fragmenter {
             return false;
         }
 
-		if (!partitionkeyTypes.get(filterColumnName).equalsIgnoreCase(serdeConstants.STRING_TYPE_NAME)) {
-            LOG.debug("Filter type is not string type , ignore this filter for hive: "
-                    + filter);
-            return false;
-        }
 
         if (filtersString.length() != 0)
             filtersString.append(prefix);
@@ -453,6 +443,10 @@ public class HiveDataFragmenter extends Fragmenter {
             case HDOP_NE:
                 filtersString.append(HIVE_API_NE);
                 break;
+            default:
+                // Set filter string to blank in case of unimplemented operations
+                filtersString.setLength(0);
+                return false;
         }
 
         filtersString.append(HIVE_API_DQUOTE);
