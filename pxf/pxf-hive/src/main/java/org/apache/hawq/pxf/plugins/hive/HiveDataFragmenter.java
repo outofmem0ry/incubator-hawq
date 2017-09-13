@@ -123,7 +123,7 @@ public class HiveDataFragmenter extends Fragmenter {
         jobConf = new JobConf(new Configuration(), clazz);
         client = HiveUtilities.initHiveClient();
         canPushDownIntegral =
-                HiveConf.getBoolVar(new Configuration(), HiveConf.ConfVars.METASTORE_INTEGER_JDO_PUSHDOWN);
+                HiveConf.getBoolVar(new HiveConf(), HiveConf.ConfVars.METASTORE_INTEGER_JDO_PUSHDOWN);
     }
 
     @Override
@@ -182,7 +182,7 @@ public class HiveDataFragmenter extends Fragmenter {
             // Save all hive partition names in a set for later filter match
             for (FieldSchema fs : tbl.getPartitionKeys()) {
                 setPartitions.add(fs.getName());
-				partitionkeyTypes.put(fs.getName(), fs.getType());
+                partitionkeyTypes.put(fs.getName(), fs.getType());
             }
 
             LOG.debug("setPartitions :" + setPartitions);
@@ -428,7 +428,6 @@ public class HiveDataFragmenter extends Fragmenter {
         }
 
         if (!colType.equalsIgnoreCase(serdeConstants.STRING_TYPE_NAME)
-                && !colType.equalsIgnoreCase(serdeConstants.DATE_TYPE_NAME)
                 && (!isIntegralSupported || !serdeConstants.IntegralTypes.contains(colType))) {
 
             return false;
