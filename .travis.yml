@@ -36,6 +36,7 @@ install:
       openssl
       python
       snappy
+      apr
   - brew reinstall
       protobuf
       protobuf-c
